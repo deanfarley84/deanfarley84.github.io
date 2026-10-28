@@ -86,6 +86,11 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 .mod i{width:28px;height:28px;border-radius:4px;background:var(--azulejo);display:block}
 .mod:nth-child(2) i{background:var(--olive)} .mod:nth-child(3) i{background:var(--terracotta)}
 .mod b{display:block}.mod p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.split label{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:10px;padding:6px 8px 6px 12px;background:var(--bg);font-size:15px}
+.split input{width:64px;flex:none;text-align:right;padding:6px 8px;font-variant-numeric:tabular-nums}
+.split-total{margin-top:8px;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.split-total.off{color:var(--terracotta)}
 .fallback{margin-top:16px;display:flex;flex-direction:column;gap:10px}
 .fallback textarea{min-height:160px;font-size:13px}
 footer{text-align:center;font-size:13px;color:var(--muted)}
@@ -188,6 +193,10 @@ const SECTIONS = [
    {id:"enquiries",type:"radio",en:"Enquiries and booking requests in a busy week",es:"Consultas y peticiones de reserva en una semana fuerte",opts:[["10","Under 20","Menos de 20"],["35","20 to 50","20 a 50"],["100","50 to 150","50 a 150"],["250","More than 150","Más de 150"]]},
    {id:"missed",type:"radio",req:1,en:"Of those, how many go unanswered or get a reply too late?",es:"De esas, ¿cuántas quedan sin respuesta o se responden tarde?",hen:"Calls during service, messages at night, DMs nobody sees. A best guess is fine.",hes:"Llamadas en plena hora punta, mensajes de noche, DMs que nadie ve. Vale una estimación.",opts:[["0","Almost none","Casi ninguna"],["3","1 to 5","1 a 5"],["10","6 to 15","6 a 15"],["22","16 to 30","16 a 30"],["40","More than 30","Más de 30"]]},
    {id:"replyTime",type:"radio",en:"How fast does a new enquiry usually get a reply?",es:"¿Con qué rapidez se responde normalmente a una consulta nueva?",opts:[["mins","Within minutes","En minutos"],["hour","Within the hour","En menos de una hora"],["day","Same day","El mismo día"],["later","Next day or later","Al día siguiente o más tarde"]]},
+   {id:"payOnline",type:"radio",en:"Do you take payments online?",es:"¿Cobras pagos online?",opts:[["full","Yes, full payment","Sí, el pago completo"],["deposit","Deposits only","Solo señales"],["links","Payment links when asked","Enlaces de pago si lo piden"],["no","No","No"],["planning","Planning to","Lo estoy planeando"]]},
+   {id:"foreign",type:"radio",en:"Roughly what share of your customers are from outside Spain?",es:"¿Qué porcentaje aproximado de tus clientes viene de fuera de España?",opts:[["0","Under 10%","Menos del 10%"],["20","10 to 30%","10 a 30%"],["45","30 to 60%","30 a 60%"],["75","More than 60%","Más del 60%"],["unknown","Not sure","No lo sé"]]},
+   {id:"foreignOnline",type:"radio",show:a=>a.foreign&&a.foreign!=="0",en:"Are your online customers and bookings mostly foreign?",es:"¿Tus clientes y reservas online son sobre todo extranjeros?",opts:[["mostly","Mostly foreign","Sobre todo extranjeros"],["mixed","About half","Más o menos la mitad"],["local","Mostly local","Sobre todo locales"],["unknown","Not sure","No lo sé"]]},
+   {id:"regions",type:"split",show:a=>a.foreign&&a.foreign!=="0",en:"Where do your foreign customers come from?",es:"¿De dónde vienen tus clientes extranjeros?",hen:"Rough percentages of your foreign customers. Aim for a total of 100, but a best guess is fine.",hes:"Porcentajes aproximados de tus clientes extranjeros. Intenta que sumen 100, pero vale una estimación.",opts:[["uk","UK and Ireland","Reino Unido e Irlanda"],["dach","Germany, Austria, Switzerland","Alemania, Austria, Suiza"],["nordics","Nordics","Países nórdicos"],["fr","France","Francia"],["be","Belgium","Bélgica"],["nl","Netherlands","Países Bajos"],["lu","Luxembourg","Luxemburgo"],["east","Eastern Europe","Europa del Este"],["latam","Latin America","Latinoamérica"],["na","North America","Norteamérica"],["asia","Asia","Asia"],["other","Other","Otros"]]},
    {id:"value",type:"number",en:"What is one new booking, sale or customer worth to you, on average?",es:"¿Cuánto vale de media para ti una reserva, venta o cliente nuevo?",hen:"In euros. Leave blank if unsure and we'll use a typical figure.",hes:"En euros. Déjalo en blanco si no lo sabes y usaremos una cifra típica."},
    {id:"repeatQ",type:"textarea",en:"Which questions do customers ask again and again?",es:"¿Qué preguntas te hacen los clientes una y otra vez?",hen:"Opening hours, prices, availability, parking, allergens…",hes:"Horarios, precios, disponibilidad, aparcamiento, alérgenos…"}
  ]},
@@ -205,9 +214,15 @@ const SECTIONS = [
    {id:"a_return",type:"radio",show:isAppt,en:"How do you bring customers back?",es:"¿Cómo consigues que los clientes vuelvan?",opts:[["nothing","We wait for them","Esperamos a que vuelvan"],["manual","Manual reminders","Recordatorios manuales"],["auto","Automated reminders or offers","Recordatorios u ofertas automáticas"]]},
    {id:"bottleneck",type:"textarea",en:"At your busiest moment, where does work pile up or get stuck?",es:"En tu momento de más trabajo, ¿dónde se acumula o se atasca el trabajo?"}
  ]},
- {id:"time",en:"Time and money",es:"Tiempo y dinero",ien:"Rough figures are fine.",ies:"Valen cifras aproximadas.",qs:[
+ {id:"time",en:"Time, money and suppliers",es:"Tiempo, dinero y proveedores",ien:"Rough figures are fine. This is where hidden costs usually sit.",ies:"Valen cifras aproximadas. Aquí suelen estar los costes ocultos.",qs:[
    {id:"adminHours",type:"radio",req:1,en:"Hours a week you and your team spend on admin, messages and paperwork",es:"Horas a la semana que tú y tu equipo dedicáis a administración, mensajes y papeleo",opts:[["2","Under 5","Menos de 5"],["8","5 to 10","5 a 10"],["15","10 to 20","10 a 20"],["30","More than 20","Más de 20"]]},
    {id:"repetitive",type:"textarea",req:1,en:"Which job do you most wish would just do itself?",es:"¿Qué tarea te gustaría que se hiciera sola?",hen:"Be as specific as you like. This is the most useful answer in the audit.",hes:"Sé todo lo concreto que quieras. Es la respuesta más útil de la auditoría."},
+   {id:"supplierCheck",type:"radio",en:"When did you last check your supplier contracts against your current invoices?",es:"¿Cuándo comprobaste por última vez tus contratos con proveedores frente a las facturas actuales?",hen:"Agreed prices, discounts and terms versus what you're actually being charged.",hes:"Precios, descuentos y condiciones pactados frente a lo que realmente te cobran.",opts:[["3m","In the last 3 months","En los últimos 3 meses"],["year","This year","Este año"],["older","Over a year ago","Hace más de un año"],["never","Never","Nunca"],["unsure","Not sure","No lo sé"]]},
+   {id:"payProviders",type:"checks",more:1,en:"Which payment providers do you use?",es:"¿Qué proveedores de pago usas?",opts:[["redsys","Bank card terminal (Redsys)","TPV del banco (Redsys)"],["stripe","Stripe","Stripe"],["sumup","SumUp","SumUp"],["square","Square","Square"],["adyen","Adyen","Adyen"],["viva","Viva Wallet","Viva Wallet"],["mypos","myPOS","myPOS"],["paypal","PayPal","PayPal"],["revolut","Revolut Business","Revolut Business"],["bizum","Bizum","Bizum"],["cash","Mostly cash","Sobre todo efectivo"],["unsure","Not sure","No lo sé"]]},
+   {id:"payoutRecon",type:"radio",en:"How do you check that payouts from your card and payment providers match your sales?",es:"¿Cómo compruebas que los abonos de tus proveedores de pago cuadran con tus ventas?",opts:[["auto","Automatically","Automáticamente"],["weekly","By hand, weekly","A mano, cada semana"],["monthly","By hand, monthly","A mano, cada mes"],["gestor","My gestor or accountant does it","Lo hace mi gestor o contable"],["no","We don't check","No lo comprobamos"]]},
+   {id:"feesKnown",type:"radio",en:"Do you know what you pay in card and payment fees as a percentage of sales?",es:"¿Sabes cuánto pagas en comisiones de tarjeta y pago como porcentaje de las ventas?",opts:[["exact","Yes, exactly","Sí, exactamente"],["rough","Roughly","Más o menos"],["no","No","No"]]},
+   {id:"financeSys",type:"checks",more:1,en:"Which finance or accounting systems do you use?",es:"¿Qué sistemas financieros o contables usas?",opts:[["holded","Holded","Holded"],["a3","A3","A3"],["sage","Sage","Sage"],["contasol","Contasol","Contasol"],["xero","Xero","Xero"],["qb","QuickBooks","QuickBooks"],["excel","Excel or spreadsheets","Excel u hojas de cálculo"],["gestor","My gestor handles it all","Lo lleva todo mi gestor"],["none","None","Ninguno"]]},
+   {id:"stockAudit",type:"checks",more:1,en:"How do you audit stock?",es:"¿Cómo controlas el stock?",opts:[["pos","Stock module in my till or POS","Módulo de stock del TPV"],["app","Dedicated inventory app","App de inventario"],["sheets","Spreadsheets","Hojas de cálculo"],["manual","Manual counts","Recuentos a mano"],["none","We don't","No lo controlamos"],["na","Not relevant to us","No aplica"]]},
    {id:"leaks",type:"checks",en:"Where else do you think money slips away?",es:"¿Dónde más crees que se escapa el dinero?",opts:[["fees","Platform commissions","Comisiones de plataformas"],["staff","Staff overtime","Horas extra del personal"],["followup","No follow-up with past customers","Sin seguimiento a clientes anteriores"],["reviews","Bad or unanswered reviews","Reseñas malas o sin responder"],["errors","Admin mistakes","Errores administrativos"],["pricing","Pricing","Precios"],["unsure","Not sure","No lo sé"]]},
    {id:"tried",type:"textarea",en:"What have you already tried to fix any of this, and why didn't it work?",es:"¿Qué has probado ya para arreglar algo de esto y por qué no funcionó?"}
  ]},
@@ -237,6 +252,7 @@ const MODULES = {
   admin:{en:["Admin and invoice automation","Reads receipts and invoices, files them and keeps your accountant happy."],es:["Automatización administrativa","Lee tickets y facturas, los archiva y facilita el trabajo a tu gestor."]},
   dashboard:{en:["Owner's dashboard","Your key numbers in one place, every morning, without chasing anyone."],es:["Panel del propietario","Tus cifras clave en un sitio, cada mañana, sin perseguir a nadie."]},
   website:{en:["Website that books","A fast, multilingual site that turns visits into bookings and enquiries."],es:["Web que reserva","Una web rápida y multilingüe que convierte visitas en reservas y consultas."]},
+  payaudit:{en:["Supplier and payment cost audit","Checks supplier invoices against agreed prices and card payouts against sales, and flags what you're being overcharged."],es:["Auditoría de proveedores y costes de pago","Compara facturas con los precios pactados y los abonos de tarjeta con las ventas, y señala los sobrecostes."]},
   return:{en:["Bring-back campaigns","Automatic messages that bring past customers back at the right time."],es:["Campañas de vuelta","Mensajes automáticos que traen de vuelta a clientes anteriores en el momento justo."]}
 };
 
@@ -272,6 +288,11 @@ function field(q){
     return `<label class="ql" for="${id}">${label}${hint}</label><input id="${id}" type="${q.type}" value="${esc(v||"")}" autocomplete="${q.ac||'off'}" ${q.req?'required':''}>`;
   if(q.type==="number")
     return `<label class="ql" for="${id}">${label}${hint}</label><div class="euro"><input id="${id}" type="number" inputmode="numeric" min="0" step="1" value="${esc(v||"")}"></div>`;
+  if(q.type==="split"){
+    const o=v||{};
+    return `<fieldset><legend>${label}${hint}</legend><div class="split">${q.opts.map(x=>
+      `<label for="${id}_${x[0]}"><span>${esc(lang==="en"?x[1]:x[2])}</span><input id="${id}_${x[0]}" data-split="${q.id}" type="number" inputmode="numeric" min="0" max="100" step="5" value="${esc(o[x[0]]||"")}" placeholder="%"></label>`).join("")}</div><div class="split-total" id="${id}_total"></div></fieldset>`;
+  }
   if(q.type==="textarea")
     return `<label class="ql" for="${id}">${label}${hint}</label><textarea id="${id}">${esc(v||"")}</textarea>`;
   if(q.type==="radio"||q.type==="checks"){
@@ -293,6 +314,7 @@ function collect(){
     if(q.type==="checks") A[q.id]=[...document.querySelectorAll(`input[name="${id}"]:checked`)].map(i=>i.value);
     else if(q.type==="radio"){ const c=document.querySelector(`input[name="${id}"]:checked`); A[q.id]=c?c.value:""; }
     else if(q.type==="consent") A[q.id]=document.getElementById(id).checked;
+    else if(q.type==="split"){ const o={}; q.opts.forEach(x=>{ const el=document.getElementById(id+"_"+x[0]); if(el&&el.value!=="") o[x[0]]=el.value; }); A[q.id]=o; }
     else { const el=document.getElementById(id); if(el) A[q.id]=el.value.trim(); }
     const m=document.getElementById(id+"_more"); if(m) A[q.id+"_more"]=m.value.trim();
   });
@@ -326,10 +348,14 @@ function renderStep(){
   s.qs.forEach(q=>{ if(q.max) applyMax(form,q); });
   form.addEventListener("change",e=>{
     const name=e.target.name||"";
-    if(name==="f_website"){ collect(); renderStep(); document.getElementById("f_website_"+A.website)?.focus(); return; }
+    if(name==="f_website"||name==="f_foreign"){ const n=name.slice(2); collect(); renderStep(); document.getElementById(name+"_"+A[n])?.focus(); return; }
     s.qs.forEach(q=>{ if(q.max && name==="f_"+q.id) applyMax(form,q); });
   });
-  form.addEventListener("input",()=>{ clearTimeout(window._sv); window._sv=setTimeout(collect,400); });
+  const totals=()=>s.qs.filter(q=>q.type==="split"&&visible(q)).forEach(q=>{ const el=document.getElementById("f_"+q.id+"_total"); if(!el) return;
+    const sum=[...form.querySelectorAll(`input[data-split="${q.id}"]`)].reduce((a,i)=>a+(Number(i.value)||0),0);
+    el.textContent=sum?`${lang==="en"?"Total":"Total"}: ${sum}%`:""; el.classList.toggle("off",sum>0&&sum!==100); });
+  totals();
+  form.addEventListener("input",()=>{ totals(); clearTimeout(window._sv); window._sv=setTimeout(collect,400); });
   const back=document.getElementById("back"); if(back) back.onclick=()=>{ collect(); step--; save(); render(); };
   form.onsubmit=e=>{ e.preventDefault(); collect(); if(!validate()) return;
     if(step===0 && !startedSent) sendStarted();
@@ -377,6 +403,7 @@ function recommend(){
   if(want.has("rota")) add("rota",3);
   if(want.has("admin") || Number(A.adminHours||0)>=15) add("admin",3);
   if(want.has("reports")) add("dashboard",3);
+  let pa=0; if(["older","never","unsure"].includes(A.supplierCheck)) pa+=2; if(["no","monthly"].includes(A.payoutRecon)) pa+=2; if(A.feesKnown==="no") pa+=1; if(pa) add("payaudit",pa+1);
   if(want.has("website") || A.website==="none") add("website",3);
   if(want.has("translate") && !isRE(A)) add("whatsapp",1);
   const order=Object.entries(pts).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
@@ -385,7 +412,7 @@ function recommend(){
 }
 
 /* ===== Payloads ===== */
-function label(q,v){ if(!q.opts) return v; const m=Object.fromEntries(q.opts.map(o=>[o[0],o[1]])); return Array.isArray(v)?v.map(x=>m[x]||x).join(", "):(m[v]||v); }
+function label(q,v){ if(q.type==="split"){ const m=Object.fromEntries(q.opts.map(o=>[o[0],o[1]])); return Object.entries(v).map(([k,x])=>`${m[k]}: ${x}%`).join(" · "); } if(!q.opts) return v; const m=Object.fromEntries(q.opts.map(o=>[o[0],o[1]])); return Array.isArray(v)?v.map(x=>m[x]||x).join(", "):(m[v]||v); }
 function base(){ return {_captcha:"false",_template:"table",_honey:A._honey||"",_replyto:A.email||""}; }
 function contactBlock(){ return {"Business":A.business,"Name":A.name,"Role":label(SECTIONS[0].qs[2],A.role),"Sector":label(SECTIONS[0].qs[3],A.sector),"Email":A.email,"Phone / WhatsApp":A.phone,"Source (ref)":REF||"direct","Answered in":lang==="en"?"English":"Spanish"}; }
 
@@ -415,6 +442,7 @@ function fullPayload(e,ls,recs){
   p["Suggested modules"]=recs.map(k=>MODULES[k].en[0]).join(" · ");
   SECTIONS.forEach((s,i)=>{ if(i===0) return; s.qs.forEach(q=>{
     if(!visible(q)) return; let v=A[q.id];
+    if(v&&typeof v==="object"&&!Array.isArray(v)&&!Object.keys(v).length) v=undefined;
     if(!(v===undefined||v===""||(Array.isArray(v)&&!v.length))) p[`${s.en} · ${q.en}`]=q.type==="number"?eur(v):label(q,v);
     if(A[q.id+"_more"]) p[`${s.en} · ${q.en} (detail)`]=A[q.id+"_more"];
   }); });
