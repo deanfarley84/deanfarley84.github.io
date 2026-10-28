@@ -186,6 +186,8 @@ const SECTIONS = [
    {id:"season",type:"radio",en:"How seasonal is your year?",es:"¿Qué tan estacional es tu año?",opts:[["summer","Much busier in summer","Mucho más fuerte en verano"],["steady","Fairly steady","Bastante estable"],["winter","Busier in winter","Más fuerte en invierno"]]},
    {id:"langs",type:"checks",en:"Languages your customers speak",es:"Idiomas de tus clientes",opts:[["es","Spanish","Español"],["en","English","Inglés"],["de","German","Alemán"],["fr","French","Francés"],["nl","Dutch","Neerlandés"],["nordic","Scandinavian","Escandinavo"],["ru","Russian","Ruso"],["ar","Arabic","Árabe"]]},
    {id:"tools",type:"checks",en:"What do you run the business on today?",es:"¿Con qué gestionas el negocio hoy?",more:1,opts:[["pos","Till or POS","TPV"],["booking","Booking system","Sistema de reservas"],["crm","CRM","CRM"],["accounts","Accounting software","Software contable"],["sheets","Spreadsheets","Hojas de cálculo"],["wab","WhatsApp Business","WhatsApp Business"],["paper","Paper and notebooks","Papel y libretas"],["memory","Mostly in my head","Casi todo de memoria"]]},
+   {id:"visibility",type:"radio",en:"How do you usually find out what happened in the business yesterday?",es:"¿Cómo te enteras normalmente de lo que pasó ayer en el negocio?",opts:[["there","I was there and saw it","Estaba allí y lo vi"],["staff","Staff or managers tell me","Me lo cuentan el personal o los encargados"],["systems","I check several systems myself","Reviso yo varios sistemas"],["reports","Weekly or monthly reports","Informes semanales o mensuales"],["late","Often only when something goes wrong","A menudo solo cuando algo sale mal"]]},
+   {id:"lateNews",type:"textarea",en:"What's the last thing you found out about too late?",es:"¿Qué es lo último de lo que te enteraste demasiado tarde?",hen:"A bad night, a lost deal, a cost that crept up, a staff problem…",hes:"Una mala noche, una venta perdida, un coste que subió, un problema de personal…"},
    {id:"website",type:"radio",en:"Your website",es:"Tu web",opts:[["good","Works well","Funciona bien"],["meh","Needs work","Necesita mejoras"],["none","Don't have one","No tengo"]]},
    {id:"websiteWish",type:"textarea",show:a=>a.website==="meh"||a.website==="none",en:"What should your website do that it doesn't today?",es:"¿Qué debería hacer tu web que hoy no hace?"}
  ]},
@@ -236,7 +238,7 @@ const SECTIONS = [
  {id:"next",en:"AI and what matters most",es:"La IA y lo más importante",ien:"Sceptical is welcome. Honest answers help most.",ies:"El escepticismo es bienvenido. Las respuestas sinceras ayudan más.",qs:[
    {id:"aiUse",type:"radio",en:"Have you used AI tools such as ChatGPT or Claude?",es:"¿Has usado herramientas de IA como ChatGPT o Claude?",opts:[["never","Never","Nunca"],["tried","A few times","Alguna vez"],["sometimes","Sometimes","A veces"],["daily","Every day","A diario"]]},
    {id:"aiWorry",type:"checks",en:"What worries you about AI in your business?",es:"¿Qué te preocupa de la IA en tu negocio?",more:1,opts:[["cost","Cost","El coste"],["personal","Losing the personal touch","Perder el trato personal"],["privacy","Customer data","Datos de clientes"],["complex","Too complicated","Demasiado complicado"],["staff","Staff won't use it","El personal no lo usará"],["mistakes","It might get things wrong","Que se equivoque"],["burnt","Tried tech before, didn't work","Ya probé tecnología y no funcionó"],["none","Nothing really","Nada en especial"]]},
-   {id:"top3",type:"checks",max:3,req:1,en:"Which three areas would you most like to improve?",es:"¿Qué tres áreas te gustaría mejorar más?",opts:[["replies","Replying to messages and calls","Responder mensajes y llamadas"],["afterhours","Out-of-hours enquiries","Consultas fuera de horario"],["bookings","Bookings and no-shows","Reservas y ausencias"],["leads","Following up leads","Seguimiento de contactos"],["website","Website","Web"],["reviews","Reviews and reputation","Reseñas y reputación"],["content","Social media content","Contenido para redes"],["stock","Stock and suppliers","Stock y proveedores"],["rota","Staff rotas","Turnos"],["admin","Admin and invoicing","Administración y facturación"],["reports","Knowing my numbers","Conocer mis cifras"],["translate","Translations","Traducciones"]]},
+   {id:"top3",type:"checks",max:3,req:1,en:"Which three areas would you most like to improve?",es:"¿Qué tres áreas te gustaría mejorar más?",opts:[["replies","Replying to messages and calls","Responder mensajes y llamadas"],["afterhours","Out-of-hours enquiries","Consultas fuera de horario"],["bookings","Bookings and no-shows","Reservas y ausencias"],["leads","Following up leads","Seguimiento de contactos"],["website","Website","Web"],["reviews","Reviews and reputation","Reseñas y reputación"],["content","Social media content","Contenido para redes"],["stock","Stock and suppliers","Stock y proveedores"],["rota","Staff rotas","Turnos"],["admin","Admin and invoicing","Administración y facturación"],["reports","Knowing my numbers","Conocer mis cifras"],["translate","Translations","Traducciones"],["overview","A daily overview of the whole business","Una visión diaria de todo el negocio"],["alerts","Warnings before things go wrong","Avisos antes de que algo falle"]]},
    {id:"success",type:"textarea",en:"Three months from now, what would make you say this was worth it?",es:"Dentro de tres meses, ¿qué te haría decir que ha merecido la pena?"},
    {id:"budget",type:"radio",en:"Monthly budget that would feel fair if it clearly paid for itself",es:"Presupuesto mensual razonable si claramente se paga solo",opts:[["<150","Under €150","Menos de 150 €"],["150-400","€150 to €400","150 € a 400 €"],["400-1000","€400 to €1,000","400 € a 1.000 €"],["1000+","Over €1,000","Más de 1.000 €"],["depends","Depends on the return","Depende del retorno"],["skip","Prefer not to say","Prefiero no decirlo"]]},
    {id:"timing",type:"radio",en:"When would you want something in place?",es:"¿Para cuándo te gustaría tenerlo?",opts:[["now","As soon as possible","Lo antes posible"],["season","Before next season","Antes de la próxima temporada"],["exploring","Just exploring","Solo estoy explorando"]]},
@@ -257,7 +259,9 @@ const MODULES = {
   stock:{en:["Stock and supplier assistant","Tracks usage, flags waste and drafts supplier orders."],es:["Asistente de stock y proveedores","Controla el consumo, detecta mermas y prepara pedidos."]},
   rota:{en:["Smart rota planner","Builds rotas from bookings and seasonality, and handles swaps by message."],es:["Planificador de turnos","Crea los turnos según reservas y temporada, y gestiona cambios por mensaje."]},
   admin:{en:["Admin and invoice automation","Reads receipts and invoices, files them and keeps your accountant happy."],es:["Automatización administrativa","Lee tickets y facturas, los archiva y facilita el trabajo a tu gestor."]},
-  dashboard:{en:["Owner's dashboard","Your key numbers in one place, every morning, without chasing anyone."],es:["Panel del propietario","Tus cifras clave en un sitio, cada mañana, sin perseguir a nadie."]},
+  dashboard:{en:["Owner's 7am briefing","The last 24 hours in one message, plus the 2 to 5 things that need you today."],es:["Resumen del propietario a las 7:00","Las últimas 24 horas en un mensaje, y las 2 a 5 cosas que te necesitan hoy."]},
+  alerts:{en:["Alerts when it matters","Hear in time when a deal is going cold, a cost spikes or a night is going badly."],es:["Alertas cuando importa","Entérate a tiempo cuando una venta se enfría, un coste se dispara o una noche va mal."]},
+  multisite:{en:["Every site on one screen","Sales, staff costs, reviews and enquiries side by side, with a briefing for each manager."],es:["Todos tus locales en una pantalla","Ventas, coste de personal, reseñas y consultas lado a lado, con un resumen para cada encargado."]},
   website:{en:["Website that books","A fast, multilingual site that turns visits into bookings and enquiries."],es:["Web que reserva","Una web rápida y multilingüe que convierte visitas en reservas y consultas."]},
   payaudit:{en:["Supplier and payment cost audit","Checks supplier invoices against agreed prices and card payouts against sales, and flags what you're being overcharged."],es:["Auditoría de proveedores y costes de pago","Compara facturas con los precios pactados y los abonos de tarjeta con las ventas, y señala los sobrecostes."]},
   return:{en:["Bring-back campaigns","Automatic messages that bring past customers back at the right time."],es:["Campañas de vuelta","Mensajes automáticos que traen de vuelta a clientes anteriores en el momento justo."]}
@@ -398,6 +402,7 @@ function leadScore(e){
   s += e.total>30000?3:e.total>10000?2:e.total>3000?1:0;
   s += (A.top3||[]).length?1:0;
   if(["daily","sometimes"].includes(A.aiUse)) s+=1;
+  if(A.sites==="2-3"||A.sites==="4+") s+=1;
   return {score:s, label: s>=9?"HOT":s>=5?"WARM":"COLD"};
 }
 
@@ -417,7 +422,10 @@ function recommend(){
   if(want.has("stock") || A.h_waste==="lots") add("stock",3);
   if(want.has("rota")) add("rota",3);
   if(want.has("admin") || Number(A.adminHours||0)>=15) add("admin",3);
-  if(want.has("reports")) add("dashboard",3);
+  if(want.has("reports")||want.has("overview")) add("dashboard",3);
+  if(["systems","reports","late"].includes(A.visibility)) add("dashboard",2+(A.visibility==="late"?2:0));
+  if(want.has("alerts")) add("alerts",3); if(A.visibility==="late") add("alerts",2);
+  if(A.sites==="2-3") add("multisite",3); if(A.sites==="4+") add("multisite",5);
   let pa=0; if(["older","never","unsure"].includes(A.supplierCheck)) pa+=2; if(["no","monthly"].includes(A.payoutRecon)) pa+=2; if(A.feesKnown==="no") pa+=1; if(pa) add("payaudit",pa+1);
   if(want.has("website") || A.website==="none") add("website",3);
   if(want.has("translate") && !isRE(A)) add("whatsapp",1);
@@ -450,7 +458,7 @@ function sendStarted(){
 
 function fullPayload(e,ls,recs){
   const p=Object.assign(base(),{_subject:`[Adelante] ${ls.label} lead: ${A.business} · ${eur(e.low)} to ${eur(e.high)} a year at risk`},contactBlock());
-  p["Lead score"]=`${ls.label} (${ls.score}/15)`;
+  p["Lead score"]=`${ls.label} (${ls.score}/16)`;
   p["Estimated annual revenue at risk"]=`${eur(e.low)} to ${eur(e.high)} (midpoint ${eur(e.total)})`;
   p["Value per booking/sale used"]=`${eur(e.value)} (${e.valueSrc})`;
   p["Breakdown"]=`Missed enquiries ${eur(e.missed)} · No-shows ${eur(e.noshow)} · Admin ${eur(e.admin)} (${Math.round(e.hours)} hours) · Payment fees ${eur(e.fees)}`;
