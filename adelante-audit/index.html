@@ -124,7 +124,7 @@ const WHATSAPP_SHOWN = "+34 711 018 011";
 const CONTROLLER = "Dean Farley, trading as Adelante, Marbella, Spain";
 
 /* Estimate assumptions (shown to the visitor) */
-const ASSUME = { noshowRecover:0.50, hourly:25, adminAutomatable:0.40, weeks:46 };
+const ASSUME = { noshowRecover:0.50, hourly:25, adminAutomatable:0.40, weeks:46, feeSaving:0.003 };
 const CONVERT = { hospitality:0.30, beauty:0.30, retail:0.20, stays:0.15, services:0.15, realestate:0.02 };
 const conv = () => CONVERT[A.sector]||0.15;
 const DEFAULT_VALUE = { hospitality:60, realestate:4000, beauty:45, stays:350, services:150, retail:40 };
@@ -136,10 +136,10 @@ const UI = {
     start:"Start the audit",next:"Continue",back:"Back",send:"See my results",sending:"Working out your results…",step:"Section",of:"of",
     required:"Please answer this one.",consentReq:"Please tick the box so we can send your results.",emailBad:"Please check the email address.",phoneBad:"Please add a phone number, including the country code.",
     max:"Pick up to",more:"Add detail (optional)",
-    resEye:"Your results",resH:"Here's what we found",resLeak:"Estimated time and money leaking each year",
-    resRange:"Rough range based on your answers",resB1:"Missed or late enquiries",resB2:"No-shows and cancellations",resB3:"Admin time that could be automated",resHours:"hours a year back",
+    resEye:"Your results",resH:"Here's what we found",resLeak:"Estimated revenue at risk and time to win back, per year",
+    resRange:"Rough range based on your answers",resB1:"Missed or late enquiries",resB2:"No-shows and cancellations",resB3:"Admin time that could be automated",resB4:"Possible card and payment fee savings",resHours:"hours a year back",
     resMods:"Three places to start",resAssume:"How we worked this out",
-    resAssumeT:"We assume {c}% of missed enquiries would have become customers (a typical rate for your sector), {n}% of no-shows can be prevented with reminders and deposits, admin time is worth €{h} an hour and {a}% of it can be automated, over {w} trading weeks. Where you didn't give a value per customer we used a typical figure for your sector. These are estimates to start a conversation, not a guarantee.",
+    resAssumeT:"We assume {c}% of missed enquiries would have become customers (a typical rate for your sector), {n}% of no-shows can be prevented with reminders and deposits, admin time is worth €{h} an hour and {a}% of it can be automated, over {w} trading weeks. Fee savings assume about 0.3 percentage points can be saved on your card takings. Where you weren't sure of your average spend we used a typical figure for your sector. Figures are revenue, not profit. These are estimates to start a conversation, not a guarantee.",
     resNext:"Dean will email you a fuller summary within a few working days. Want to talk sooner?",wa:"Book a 15-minute call on WhatsApp",waMsg:"Hi Dean, I've just done the Adelante audit for",
     failH:"Your answers couldn't be sent",failP:"Your results are below, but Dean hasn't received your answers yet. Copy them and send them to",copy:"Copy answers",copied:"Copied",retry:"Try sending again",
     foot:"Adelante · Modular AI, built into your business · Marbella",saved:"Your progress saves on this device.",
@@ -150,10 +150,10 @@ const UI = {
     start:"Empezar",next:"Continuar",back:"Atrás",send:"Ver mis resultados",sending:"Calculando tus resultados…",step:"Sección",of:"de",
     required:"Por favor, responde a esta.",consentReq:"Marca la casilla para que podamos enviarte los resultados.",emailBad:"Revisa el correo electrónico.",phoneBad:"Añade un teléfono, con el prefijo del país.",
     max:"Elige hasta",more:"Añadir detalle (opcional)",
-    resEye:"Tus resultados",resH:"Esto es lo que hemos visto",resLeak:"Tiempo y dinero que se pierden al año (estimación)",
-    resRange:"Rango aproximado según tus respuestas",resB1:"Consultas perdidas o tardías",resB2:"Ausencias y cancelaciones",resB3:"Tiempo administrativo automatizable",resHours:"horas al año recuperadas",
+    resEye:"Tus resultados",resH:"Esto es lo que hemos visto",resLeak:"Ingresos en riesgo y tiempo a recuperar al año (estimación)",
+    resRange:"Rango aproximado según tus respuestas",resB1:"Consultas perdidas o tardías",resB2:"Ausencias y cancelaciones",resB3:"Tiempo administrativo automatizable",resB4:"Posible ahorro en comisiones de pago",resHours:"horas al año recuperadas",
     resMods:"Tres puntos para empezar",resAssume:"Cómo lo hemos calculado",
-    resAssumeT:"Suponemos que el {c}% de las consultas perdidas se habrían convertido en clientes (una tasa típica de tu sector), que el {n}% de las ausencias se evitan con recordatorios y señales, que el tiempo administrativo vale {h} € la hora y que el {a}% se puede automatizar, durante {w} semanas de actividad. Si no indicaste el valor por cliente, usamos una cifra típica de tu sector. Son estimaciones para empezar a hablar, no una garantía.",
+    resAssumeT:"Suponemos que el {c}% de las consultas perdidas se habrían convertido en clientes (una tasa típica de tu sector), que el {n}% de las ausencias se evitan con recordatorios y señales, que el tiempo administrativo vale {h} € la hora y que el {a}% se puede automatizar, durante {w} semanas de actividad. El ahorro en comisiones supone unos 0,3 puntos porcentuales sobre tu facturación con tarjeta. Si no sabías tu gasto medio, usamos una cifra típica de tu sector. Las cifras son ingresos, no beneficio. Son estimaciones para empezar a hablar, no una garantía.",
     resNext:"Dean te enviará un resumen más completo en pocos días laborables. ¿Prefieres hablar antes?",wa:"Reservar 15 minutos por WhatsApp",waMsg:"Hola Dean, acabo de hacer la auditoría de Adelante para",
     failH:"No se han podido enviar tus respuestas",failP:"Tus resultados están abajo, pero Dean aún no ha recibido tus respuestas. Cópialas y envíalas a",copy:"Copiar respuestas",copied:"Copiado",retry:"Intentar enviar de nuevo",
     foot:"Adelante · IA modular, integrada en tu negocio · Marbella",saved:"Tu progreso se guarda en este dispositivo.",
@@ -163,7 +163,8 @@ const UI = {
 const isHosp = a => a.sector==="hospitality";
 const isRE = a => a.sector==="realestate";
 const isAppt = a => !!a.sector && !isHosp(a) && !isRE(a);
-const hasNoShows = a => isHosp(a) || isAppt(a);
+const isRetail = a => a.sector==="retail";
+const hasNoShows = a => isHosp(a) || (isAppt(a) && !isRetail(a));
 
 /* q: id, type, en, es, hen/hes hints, opts [value,en,es], req, max, show(a), more (adds optional detail box) */
 const SECTIONS = [
@@ -197,7 +198,12 @@ const SECTIONS = [
    {id:"foreign",type:"radio",en:"Roughly what share of your customers are from outside Spain?",es:"¿Qué porcentaje aproximado de tus clientes viene de fuera de España?",opts:[["0","Under 10%","Menos del 10%"],["20","10 to 30%","10 a 30%"],["45","30 to 60%","30 a 60%"],["75","More than 60%","Más del 60%"],["unknown","Not sure","No lo sé"]]},
    {id:"foreignOnline",type:"radio",show:a=>a.foreign&&a.foreign!=="0",en:"Are your online customers and bookings mostly foreign?",es:"¿Tus clientes y reservas online son sobre todo extranjeros?",opts:[["mostly","Mostly foreign","Sobre todo extranjeros"],["mixed","About half","Más o menos la mitad"],["local","Mostly local","Sobre todo locales"],["unknown","Not sure","No lo sé"]]},
    {id:"regions",type:"split",show:a=>a.foreign&&a.foreign!=="0",en:"Where do your foreign customers come from?",es:"¿De dónde vienen tus clientes extranjeros?",hen:"Rough percentages of your foreign customers. Aim for a total of 100, but a best guess is fine.",hes:"Porcentajes aproximados de tus clientes extranjeros. Intenta que sumen 100, pero vale una estimación.",opts:[["uk","UK and Ireland","Reino Unido e Irlanda"],["dach","Germany, Austria, Switzerland","Alemania, Austria, Suiza"],["nordics","Nordics","Países nórdicos"],["fr","France","Francia"],["be","Belgium","Bélgica"],["nl","Netherlands","Países Bajos"],["lu","Luxembourg","Luxemburgo"],["east","Eastern Europe","Europa del Este"],["latam","Latin America","Latinoamérica"],["na","North America","Norteamérica"],["asia","Asia","Asia"],["other","Other","Otros"]]},
-   {id:"value",type:"number",en:"What is one new booking, sale or customer worth to you, on average?",es:"¿Cuánto vale de media para ti una reserva, venta o cliente nuevo?",hen:"In euros. Leave blank if unsure and we'll use a typical figure.",hes:"En euros. Déjalo en blanco si no lo sabes y usaremos una cifra típica."},
+   {id:"h_spendTable",type:"radio",req:1,show:isHosp,en:"Average spend per table or booking",es:"Gasto medio por mesa o reserva",opts:[["30","Under €40","Menos de 40 €"],["60","€40 to €80","40 € a 80 €"],["110","€80 to €150","80 € a 150 €"],["220","€150 to €300","150 € a 300 €"],["400","Over €300","Más de 300 €"],["unsure","Not sure","No lo sé"]]},
+   {id:"h_spendHead",type:"radio",req:1,show:isHosp,en:"Average spend per person",es:"Gasto medio por persona",opts:[["12","Under €15","Menos de 15 €"],["22","€15 to €30","15 € a 30 €"],["40","€30 to €50","30 € a 50 €"],["65","€50 to €80","50 € a 80 €"],["100","Over €80","Más de 80 €"],["unsure","Not sure","No lo sé"]]},
+   {id:"r_commission",type:"radio",req:1,show:isRE,en:"Average commission you earn per sale",es:"Comisión media que ganas por venta",opts:[["3500","Under €5,000","Menos de 5.000 €"],["7500","€5,000 to €10,000","5.000 € a 10.000 €"],["15000","€10,000 to €20,000","10.000 € a 20.000 €"],["30000","€20,000 to €40,000","20.000 € a 40.000 €"],["50000","Over €40,000","Más de 40.000 €"],["unsure","Not sure","No lo sé"]]},
+   {id:"a_spend",type:"radio",req:1,show:a=>isAppt(a)&&!isRetail(a),en:"Average spend per visit, booking or stay",es:"Gasto medio por visita, reserva o estancia",opts:[["20","Under €30","Menos de 30 €"],["45","€30 to €60","30 € a 60 €"],["90","€60 to €120","60 € a 120 €"],["200","€120 to €300","120 € a 300 €"],["600","€300 to €1,000","300 € a 1.000 €"],["1500","Over €1,000","Más de 1.000 €"],["unsure","Not sure","No lo sé"]]},
+   {id:"a_visits",type:"radio",show:a=>isAppt(a)&&!isRetail(a),en:"How many times a year does a typical customer come back?",es:"¿Cuántas veces al año vuelve un cliente típico?",opts:[["1","Once","Una vez"],["2.5","2 to 3","2 a 3"],["5","4 to 6","4 a 6"],["9","7 to 12","7 a 12"],["15","More than 12","Más de 12"],["unsure","Not sure","No lo sé"]]},
+   {id:"rt_order",type:"radio",req:1,show:isRetail,en:"Average order value",es:"Valor medio del pedido",opts:[["15","Under €25","Menos de 25 €"],["40","€25 to €60","25 € a 60 €"],["90","€60 to €120","60 € a 120 €"],["200","€120 to €300","120 € a 300 €"],["450","Over €300","Más de 300 €"],["unsure","Not sure","No lo sé"]]},
    {id:"repeatQ",type:"textarea",en:"Which questions do customers ask again and again?",es:"¿Qué preguntas te hacen los clientes una y otra vez?",hen:"Opening hours, prices, availability, parking, allergens…",hes:"Horarios, precios, disponibilidad, aparcamiento, alérgenos…"}
  ]},
  {id:"ops",en:"How the work gets done",es:"Cómo se hace el trabajo",ien:"A few questions specific to your type of business.",ies:"Unas preguntas específicas de tu tipo de negocio.",qs:[
@@ -219,6 +225,7 @@ const SECTIONS = [
    {id:"repetitive",type:"textarea",req:1,en:"Which job do you most wish would just do itself?",es:"¿Qué tarea te gustaría que se hiciera sola?",hen:"Be as specific as you like. This is the most useful answer in the audit.",hes:"Sé todo lo concreto que quieras. Es la respuesta más útil de la auditoría."},
    {id:"supplierCheck",type:"radio",en:"When did you last check your supplier contracts against your current invoices?",es:"¿Cuándo comprobaste por última vez tus contratos con proveedores frente a las facturas actuales?",hen:"Agreed prices, discounts and terms versus what you're actually being charged.",hes:"Precios, descuentos y condiciones pactados frente a lo que realmente te cobran.",opts:[["3m","In the last 3 months","En los últimos 3 meses"],["year","This year","Este año"],["older","Over a year ago","Hace más de un año"],["never","Never","Nunca"],["unsure","Not sure","No lo sé"]]},
    {id:"payProviders",type:"checks",more:1,en:"Which payment providers do you use?",es:"¿Qué proveedores de pago usas?",opts:[["redsys","Bank card terminal (Redsys)","TPV del banco (Redsys)"],["stripe","Stripe","Stripe"],["sumup","SumUp","SumUp"],["square","Square","Square"],["adyen","Adyen","Adyen"],["viva","Viva Wallet","Viva Wallet"],["mypos","myPOS","myPOS"],["paypal","PayPal","PayPal"],["revolut","Revolut Business","Revolut Business"],["bizum","Bizum","Bizum"],["cash","Mostly cash","Sobre todo efectivo"],["unsure","Not sure","No lo sé"]]},
+   {id:"cardMonthly",type:"radio",en:"Average monthly takings by card and online payment",es:"Facturación media mensual con tarjeta y pagos online",opts:[["5000","Under €10,000","Menos de 10.000 €"],["20000","€10,000 to €30,000","10.000 € a 30.000 €"],["50000","€30,000 to €75,000","30.000 € a 75.000 €"],["110000","€75,000 to €150,000","75.000 € a 150.000 €"],["200000","Over €150,000","Más de 150.000 €"],["unsure","Not sure","No lo sé"]]},
    {id:"payoutRecon",type:"radio",en:"How do you check that payouts from your card and payment providers match your sales?",es:"¿Cómo compruebas que los abonos de tus proveedores de pago cuadran con tus ventas?",opts:[["auto","Automatically","Automáticamente"],["weekly","By hand, weekly","A mano, cada semana"],["monthly","By hand, monthly","A mano, cada mes"],["gestor","My gestor or accountant does it","Lo hace mi gestor o contable"],["no","We don't check","No lo comprobamos"]]},
    {id:"feesKnown",type:"radio",en:"Do you know what you pay in card and payment fees as a percentage of sales?",es:"¿Sabes cuánto pagas en comisiones de tarjeta y pago como porcentaje de las ventas?",opts:[["exact","Yes, exactly","Sí, exactamente"],["rough","Roughly","Más o menos"],["no","No","No"]]},
    {id:"financeSys",type:"checks",more:1,en:"Which finance or accounting systems do you use?",es:"¿Qué sistemas financieros o contables usas?",opts:[["holded","Holded","Holded"],["a3","A3","A3"],["sage","Sage","Sage"],["contasol","Contasol","Contasol"],["xero","Xero","Xero"],["qb","QuickBooks","QuickBooks"],["excel","Excel or spreadsheets","Excel u hojas de cálculo"],["gestor","My gestor handles it all","Lo lleva todo mi gestor"],["none","None","Ninguno"]]},
@@ -363,16 +370,24 @@ function renderStep(){
 }
 
 /* ===== Scoring and estimate ===== */
+function valuePer(){
+  const n = k => { const v=Number(A[k]); return v>0?v:0; };
+  if(isHosp(A)){ if(n("h_spendTable")) return {v:n("h_spendTable"),src:"spend per table"}; if(n("h_spendHead")) return {v:n("h_spendHead")*2.5,src:"spend per head x 2.5 covers"}; }
+  if(isRE(A) && n("r_commission")) return {v:n("r_commission"),src:"commission per sale"};
+  if(isRetail(A) && n("rt_order")) return {v:n("rt_order"),src:"average order"};
+  if(isAppt(A) && n("a_spend")) return {v:n("a_spend"),src:"spend per visit"};
+  return {v:DEFAULT_VALUE[A.sector]||80,src:"sector default (not given)",assumed:true};
+}
 function estimate(){
-  const num = k => Number(A[k]||0);
-  const typed = Number(A.value);
-  const value = typed>0 ? typed : (DEFAULT_VALUE[A.sector]||80);
+  const num = k => { const v=Number(A[k]); return v>0?v:0; };
+  const vp = valuePer(), value = vp.v;
   const missed = num("missed")*value*conv()*ASSUME.weeks;
   const noshow = hasNoShows(A) ? num("noshows")*value*ASSUME.noshowRecover*ASSUME.weeks : 0;
   const hours = num("adminHours")*ASSUME.adminAutomatable*ASSUME.weeks;
   const admin = hours*ASSUME.hourly;
-  const total = missed+noshow+admin;
-  return {value, valueAssumed: !(typed>0), missed, noshow, admin, hours, total, low: total*0.6, high: total*1.3};
+  const fees = num("cardMonthly")*12*ASSUME.feeSaving;
+  const total = missed+noshow+admin+fees;
+  return {value, valueSrc:vp.src, valueAssumed:!!vp.assumed, missed, noshow, admin, hours, fees, total, low: total*0.6, high: total*1.3};
 }
 
 function leadScore(e){
@@ -434,11 +449,12 @@ function sendStarted(){
 }
 
 function fullPayload(e,ls,recs){
-  const p=Object.assign(base(),{_subject:`[Adelante] ${ls.label} lead: ${A.business} · est. ${eur(e.low)} to ${eur(e.high)} a year`},contactBlock());
+  const p=Object.assign(base(),{_subject:`[Adelante] ${ls.label} lead: ${A.business} · ${eur(e.low)} to ${eur(e.high)} a year at risk`},contactBlock());
   p["Lead score"]=`${ls.label} (${ls.score}/15)`;
-  p["Estimated annual leak"]=`${eur(e.low)} to ${eur(e.high)} (midpoint ${eur(e.total)})`;
-  p["Value per customer used"]=`${eur(e.value)}${e.valueAssumed?" (sector default, not given)":""}`;
-  p["Breakdown"]=`Missed enquiries ${eur(e.missed)} · No-shows ${eur(e.noshow)} · Admin ${eur(e.admin)} (${Math.round(e.hours)} hours)`;
+  p["Estimated annual revenue at risk"]=`${eur(e.low)} to ${eur(e.high)} (midpoint ${eur(e.total)})`;
+  p["Value per booking/sale used"]=`${eur(e.value)} (${e.valueSrc})`;
+  p["Breakdown"]=`Missed enquiries ${eur(e.missed)} · No-shows ${eur(e.noshow)} · Admin ${eur(e.admin)} (${Math.round(e.hours)} hours) · Payment fees ${eur(e.fees)}`;
+  p["Assumptions used"]=`Conversion ${Math.round(conv()*100)}% · no-shows preventable ${ASSUME.noshowRecover*100}% · admin €${ASSUME.hourly}/h, ${ASSUME.adminAutomatable*100}% automatable · ${ASSUME.weeks} weeks · fee saving ${(ASSUME.feeSaving*100).toFixed(1)}pp of card takings · revenue, not profit`;
   p["Suggested modules"]=recs.map(k=>MODULES[k].en[0]).join(" · ");
   SECTIONS.forEach((s,i)=>{ if(i===0) return; s.qs.forEach(q=>{
     if(!visible(q)) return; let v=A[q.id];
@@ -471,7 +487,8 @@ function renderResults(e,recs,ok){
   <div class="result"><div class="note">${t("resLeak")}</div><div class="big">${eur(e.low)} – ${eur(e.high)}</div><div class="note">${t("resRange")}</div>
     <div class="breakdown"><div><span>${t("resB1")}</span><span>${eur(e.missed)}</span></div>
     ${e.noshow?`<div><span>${t("resB2")}</span><span>${eur(e.noshow)}</span></div>`:""}
-    <div><span>${t("resB3")}</span><span>${eur(e.admin)} · ${Math.round(e.hours)} ${t("resHours")}</span></div></div></div>
+    <div><span>${t("resB3")}</span><span>${eur(e.admin)} · ${Math.round(e.hours)} ${t("resHours")}</span></div>
+    ${e.fees?`<div><span>${t("resB4")}</span><span>${eur(e.fees)}</span></div>`:""}</div></div>
   <h3 style="margin-top:24px">${t("resMods")}</h3>
   <div class="mods">${recs.map(k=>`<div class="mod"><i aria-hidden="true"></i><div><b>${esc(MODULES[k][lang][0])}</b><p>${esc(MODULES[k][lang][1])}</p></div></div>`).join("")}</div>
   <details class="more" style="margin-top:20px"><summary>${t("resAssume")}</summary><p class="note">${esc(a)}</p></details>
