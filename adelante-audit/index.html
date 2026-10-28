@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Adelante Business Audit</title>
+<meta name="description" content="Free 8-minute audit: find where your business is losing time and money, and which AI tools would actually help.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: single-column "doorway" card; arch header; tile progress where each tile is one section */
+:root{
+  --bg:#f7f2ec; --surface:#fffdf9; --ink:#2b2420; --muted:#6f625a; --line:#e3d7cc;
+  --terracotta:#b8532f; --terracotta-ink:#ffffff; --olive:#6b7a3a; --azulejo:#245c8f; --tile-off:#eadfd4;
+  --error:#a3261b; --focus:#245c8f;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1c1714; --surface:#26201c; --ink:#f2e9e1; --muted:#b5a79c; --line:#3d332d;
+  --terracotta:#d9714b; --terracotta-ink:#1c1714; --olive:#a3b46a; --azulejo:#7fb0dc; --tile-off:#3a302a;
+  --error:#f08a7e; --focus:#7fb0dc; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#1c1714; --surface:#26201c; --ink:#f2e9e1; --muted:#b5a79c; --line:#3d332d;
+  --terracotta:#d9714b; --terracotta-ink:#1c1714; --olive:#a3b46a; --azulejo:#7fb0dc; --tile-off:#3a302a;
+  --error:#f08a7e; --focus:#7fb0dc; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:22px;color:var(--terracotta)}
+.brand svg{width:30px;height:36px;flex:none}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{background:transparent;border:0;color:var(--muted);font:600 13px var(--body);padding:6px 14px;cursor:pointer;letter-spacing:.04em}
+.lang button[aria-pressed="true"]{background:var(--azulejo);color:var(--surface)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:28px 28px 14px 14px;padding:28px max(20px,4vw) 24px}
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:18px}
+.tiles span{height:8px;background:var(--tile-off);border-radius:2px;transition:background .3s}
+.tiles span.done{background:var(--olive)} .tiles span.now{background:var(--terracotta)}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--azulejo)}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;line-height:1.2}
+h1{font-size:clamp(28px,6vw,38px);margin:6px 0 8px} h2{font-size:clamp(23px,5vw,29px);margin:6px 0 8px} h3{font-size:20px;margin:0 0 6px}
+.lead{color:var(--muted);margin:0 0 4px;max-width:60ch}
+.qs{display:flex;flex-direction:column;gap:22px;margin-top:22px}
+.q label.ql,.q legend{display:block;font-weight:600;margin-bottom:4px;padding:0}
+.q .hint{display:block;font-size:14px;color:var(--muted);margin-bottom:8px;font-weight:400}
+.q fieldset{border:0;margin:0;padding:0;min-width:0}
+input[type=text],input[type=email],input[type=tel],input[type=number],textarea,select{width:100%;font:16px var(--body);color:var(--ink);background:var(--bg);
+  border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+textarea{min-height:84px;resize:vertical}
+.euro{position:relative}.euro input{padding-left:30px}.euro::before{content:"€";position:absolute;left:12px;top:11px;color:var(--muted)}
+input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,.chip input:focus-visible+span{outline:3px solid var(--focus);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:15px;cursor:pointer;background:var(--bg);user-select:none}
+.chip input:checked+span{background:var(--azulejo);border-color:var(--azulejo);color:var(--surface)}
+.chip input:disabled+span{opacity:.45;cursor:not-allowed}
+.more{margin-top:8px}
+.more summary{font-size:14px;color:var(--azulejo);cursor:pointer;font-weight:600}
+.more textarea{margin-top:8px;min-height:70px}
+.req{color:var(--terracotta)}
+.err{color:var(--error);font-size:14px;margin-top:6px}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.consent input{margin-top:4px;width:18px;height:18px;flex:none;accent-color:var(--azulejo)}
+.privacy{font-size:13px;color:var(--muted);margin-top:8px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px;flex-wrap:wrap}
+.btn{font:600 16px var(--body);border-radius:999px;padding:12px 24px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);text-decoration:none;display:inline-block}
+.btn.primary{background:var(--terracotta);border-color:var(--terracotta);color:var(--terracotta-ink)}
+.btn.wa{background:var(--olive);border-color:var(--olive);color:var(--surface)}
+.btn:disabled{opacity:.6;cursor:wait}
+.promise{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:20px}
+.promise div{border-top:3px solid var(--olive);padding-top:10px;font-size:15px;color:var(--muted)}
+.promise b{display:block;color:var(--ink);font-weight:600;margin-bottom:2px}
+.note{font-size:13px;color:var(--muted)}
+.result{margin-top:20px;padding:20px;border-radius:16px;background:var(--bg);border:1px solid var(--line)}
+.big{font-family:var(--display);font-size:clamp(30px,8vw,44px);color:var(--terracotta);line-height:1.1;font-variant-numeric:tabular-nums}
+.breakdown{display:grid;gap:8px;margin-top:14px;font-size:15px}
+.breakdown div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.breakdown span:last-child{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.mods{display:grid;gap:12px;margin-top:14px}
+.mod{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start}
+.mod i{width:28px;height:28px;border-radius:4px;background:var(--azulejo);display:block}
+.mod:nth-child(2) i{background:var(--olive)} .mod:nth-child(3) i{background:var(--terracotta)}
+.mod b{display:block}.mod p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.fallback{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.fallback textarea{min-height:160px;font-size:13px}
+footer{text-align:center;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 30 36" aria-hidden="true"><path d="M2 35V15a13 13 0 0 1 26 0v20" fill="none" stroke="currentColor" stroke-width="2.5"/><rect x="8" y="20" width="6" height="6" fill="var(--azulejo)"/><rect x="16" y="20" width="6" height="6" fill="var(--olive)"/><rect x="8" y="28" width="6" height="6" fill="var(--olive)"/><rect x="16" y="28" width="6" height="6" fill="currentColor"/></svg>
+      Adelante
+    </div>
+    <div class="lang" role="group" aria-label="Language / Idioma">
+      <button type="button" id="lang-en" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" id="lang-es" data-lang="es" aria-pressed="false">ES</button>
+    </div>
+  </header>
+  <main class="card" id="card" tabindex="-1"></main>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+/* ===== Settings ===== */
+const SUBMIT_URL = "https://formsubmit.co/ajax/deanfarley84@gmail.com"; // after activation, swap the email for FormSubmit's random alias
+const CONTACT_EMAIL = "deanfarley84@gmail.com";
+const WHATSAPP = "34711018011";
+const WHATSAPP_SHOWN = "+34 711 018 011";
+const CONTROLLER = "Dean Farley, trading as Adelante, Marbella, Spain";
+
+/* Estimate assumptions (shown to the visitor) */
+const ASSUME = { noshowRecover:0.50, hourly:25, adminAutomatable:0.40, weeks:46 };
+const CONVERT = { hospitality:0.30, beauty:0.30, retail:0.20, stays:0.15, services:0.15, realestate:0.02 };
+const conv = () => CONVERT[A.sector]||0.15;
+const DEFAULT_VALUE = { hospitality:60, realestate:4000, beauty:45, stays:350, services:150, retail:40 };
+
+const UI = {
+  en:{introEye:"Free business audit",introH:"Where is your business losing time and money?",
+    introP:"Eight minutes, mostly taps. At the end you'll see a rough estimate of what's leaking each year and the three changes most likely to help. Dean then reviews your answers personally.",
+    p1:"Instant estimate",p1t:"See your numbers the moment you finish.",p2:"Read by a person",p2t:"Dean reviews every answer, not a bot.",p3:"No obligation",p3t:"If nothing is worth fixing, you'll be told so.",
+    start:"Start the audit",next:"Continue",back:"Back",send:"See my results",sending:"Working out your results…",step:"Section",of:"of",
+    required:"Please answer this one.",consentReq:"Please tick the box so we can send your results.",emailBad:"Please check the email address.",phoneBad:"Please add a phone number, including the country code.",
+    max:"Pick up to",more:"Add detail (optional)",
+    resEye:"Your results",resH:"Here's what we found",resLeak:"Estimated time and money leaking each year",
+    resRange:"Rough range based on your answers",resB1:"Missed or late enquiries",resB2:"No-shows and cancellations",resB3:"Admin time that could be automated",resHours:"hours a year back",
+    resMods:"Three places to start",resAssume:"How we worked this out",
+    resAssumeT:"We assume {c}% of missed enquiries would have become customers (a typical rate for your sector), {n}% of no-shows can be prevented with reminders and deposits, admin time is worth €{h} an hour and {a}% of it can be automated, over {w} trading weeks. Where you didn't give a value per customer we used a typical figure for your sector. These are estimates to start a conversation, not a guarantee.",
+    resNext:"Dean will email you a fuller summary within a few working days. Want to talk sooner?",wa:"Book a 15-minute call on WhatsApp",waMsg:"Hi Dean, I've just done the Adelante audit for",
+    failH:"Your answers couldn't be sent",failP:"Your results are below, but Dean hasn't received your answers yet. Copy them and send them to",copy:"Copy answers",copied:"Copied",retry:"Try sending again",
+    foot:"Adelante · Modular AI, built into your business · Marbella",saved:"Your progress saves on this device.",
+    privacy:"Your answers are held by {ctl} and used only to prepare this audit and contact you about it. They're never sold or shared. Ask for a copy or deletion any time at {em}."},
+  es:{introEye:"Auditoría gratuita",introH:"¿Dónde está perdiendo tiempo y dinero tu negocio?",
+    introP:"Ocho minutos, casi todo con un toque. Al final verás una estimación aproximada de lo que se pierde cada año y los tres cambios que más te ayudarían. Después, Dean revisa tus respuestas personalmente.",
+    p1:"Estimación al instante",p1t:"Ves tus cifras en cuanto terminas.",p2:"Lo lee una persona",p2t:"Dean revisa cada respuesta, no un bot.",p3:"Sin compromiso",p3t:"Si no hay nada que merezca la pena mejorar, te lo diremos.",
+    start:"Empezar",next:"Continuar",back:"Atrás",send:"Ver mis resultados",sending:"Calculando tus resultados…",step:"Sección",of:"de",
+    required:"Por favor, responde a esta.",consentReq:"Marca la casilla para que podamos enviarte los resultados.",emailBad:"Revisa el correo electrónico.",phoneBad:"Añade un teléfono, con el prefijo del país.",
+    max:"Elige hasta",more:"Añadir detalle (opcional)",
+    resEye:"Tus resultados",resH:"Esto es lo que hemos visto",resLeak:"Tiempo y dinero que se pierden al año (estimación)",
+    resRange:"Rango aproximado según tus respuestas",resB1:"Consultas perdidas o tardías",resB2:"Ausencias y cancelaciones",resB3:"Tiempo administrativo automatizable",resHours:"horas al año recuperadas",
+    resMods:"Tres puntos para empezar",resAssume:"Cómo lo hemos calculado",
+    resAssumeT:"Suponemos que el {c}% de las consultas perdidas se habrían convertido en clientes (una tasa típica de tu sector), que el {n}% de las ausencias se evitan con recordatorios y señales, que el tiempo administrativo vale {h} € la hora y que el {a}% se puede automatizar, durante {w} semanas de actividad. Si no indicaste el valor por cliente, usamos una cifra típica de tu sector. Son estimaciones para empezar a hablar, no una garantía.",
+    resNext:"Dean te enviará un resumen más completo en pocos días laborables. ¿Prefieres hablar antes?",wa:"Reservar 15 minutos por WhatsApp",waMsg:"Hola Dean, acabo de hacer la auditoría de Adelante para",
+    failH:"No se han podido enviar tus respuestas",failP:"Tus resultados están abajo, pero Dean aún no ha recibido tus respuestas. Cópialas y envíalas a",copy:"Copiar respuestas",copied:"Copiado",retry:"Intentar enviar de nuevo",
+    foot:"Adelante · IA modular, integrada en tu negocio · Marbella",saved:"Tu progreso se guarda en este dispositivo.",
+    privacy:"Tus respuestas las guarda {ctl} y solo se usan para preparar esta auditoría y contactarte sobre ella. Nunca se venden ni se comparten. Pide una copia o su eliminación cuando quieras en {em}."}
+};
+
+const isHosp = a => a.sector==="hospitality";
+const isRE = a => a.sector==="realestate";
+const isAppt = a => !!a.sector && !isHosp(a) && !isRE(a);
+const hasNoShows = a => isHosp(a) || isAppt(a);
+
+/* q: id, type, en, es, hen/hes hints, opts [value,en,es], req, max, show(a), more (adds optional detail box) */
+const SECTIONS = [
+ {id:"you",en:"You and your business",es:"Tú y tu negocio",ien:"So we can send your results.",ies:"Para poder enviarte los resultados.",qs:[
+   {id:"business",type:"text",req:1,en:"Business name",es:"Nombre del negocio",ac:"organization"},
+   {id:"name",type:"text",req:1,en:"Your name",es:"Tu nombre",ac:"name"},
+   {id:"role",type:"radio",req:1,en:"Your role",es:"Tu cargo",opts:[["owner","Owner","Propietario"],["partner","Partner or director","Socio o director"],["manager","Manager","Gerente"],["staff","Team member","Empleado"]]},
+   {id:"sector",type:"radio",req:1,en:"What kind of business is it?",es:"¿Qué tipo de negocio es?",opts:[
+     ["hospitality","Bar, restaurant or chiringuito","Bar, restaurante o chiringuito"],["realestate","Real estate agency","Inmobiliaria"],
+     ["beauty","Barber, salon, clinic or spa","Barbería, peluquería, clínica o spa"],["stays","Hotel or holiday rentals","Hotel o alquiler vacacional"],
+     ["services","Other service business","Otro negocio de servicios"],["retail","Shop or retail","Tienda o comercio"]]},
+   {id:"email",type:"email",req:1,en:"Email",es:"Email",ac:"email"},
+   {id:"phone",type:"tel",req:1,en:"Mobile or WhatsApp",es:"Móvil o WhatsApp",hen:"Include the country code, for example +34",hes:"Incluye el prefijo, por ejemplo +34",ac:"tel"},
+   {id:"consent",type:"consent",req:1,en:"Send me my results and let Adelante contact me about this audit.",es:"Enviadme mis resultados y que Adelante me contacte sobre esta auditoría."}
+ ]},
+ {id:"today",en:"Your business today",es:"Tu negocio hoy",ien:"Quick taps. Skip anything you're unsure of.",ies:"Toques rápidos. Salta lo que no tengas claro.",qs:[
+   {id:"sites",type:"radio",en:"How many locations?",es:"¿Cuántos locales?",opts:[["1","1","1"],["2-3","2 to 3","2 a 3"],["4+","4 or more","4 o más"]]},
+   {id:"team",type:"radio",en:"People working in the business, including you",es:"Personas en el negocio, contándote a ti",opts:[["1-5","1 to 5","1 a 5"],["6-15","6 to 15","6 a 15"],["16-40","16 to 40","16 a 40"],["40+","More than 40","Más de 40"]]},
+   {id:"season",type:"radio",en:"How seasonal is your year?",es:"¿Qué tan estacional es tu año?",opts:[["summer","Much busier in summer","Mucho más fuerte en verano"],["steady","Fairly steady","Bastante estable"],["winter","Busier in winter","Más fuerte en invierno"]]},
+   {id:"langs",type:"checks",en:"Languages your customers speak",es:"Idiomas de tus clientes",opts:[["es","Spanish","Español"],["en","English","Inglés"],["de","German","Alemán"],["fr","French","Francés"],["nl","Dutch","Neerlandés"],["nordic","Scandinavian","Escandinavo"],["ru","Russian","Ruso"],["ar","Arabic","Árabe"]]},
+   {id:"tools",type:"checks",en:"What do you run the business on today?",es:"¿Con qué gestionas el negocio hoy?",more:1,opts:[["pos","Till or POS","TPV"],["booking","Booking system","Sistema de reservas"],["crm","CRM","CRM"],["accounts","Accounting software","Software contable"],["sheets","Spreadsheets","Hojas de cálculo"],["wab","WhatsApp Business","WhatsApp Business"],["paper","Paper and notebooks","Papel y libretas"],["memory","Mostly in my head","Casi todo de memoria"]]},
+   {id:"website",type:"radio",en:"Your website",es:"Tu web",opts:[["good","Works well","Funciona bien"],["meh","Needs work","Necesita mejoras"],["none","Don't have one","No tengo"]]},
+   {id:"websiteWish",type:"textarea",show:a=>a.website==="meh"||a.website==="none",en:"What should your website do that it doesn't today?",es:"¿Qué debería hacer tu web que hoy no hace?"}
+ ]},
+ {id:"customers",en:"Customers and enquiries",es:"Clientes y consultas",ien:"This is usually where the biggest leak is.",ies:"Normalmente aquí está la mayor fuga.",qs:[
+   {id:"channels",type:"checks",en:"How do customers contact you or book?",es:"¿Cómo te contactan o reservan?",opts:[["phone","Phone","Teléfono"],["wa","WhatsApp","WhatsApp"],["dm","Instagram DMs","Mensajes de Instagram"],["email","Email","Email"],["form","Website form","Formulario web"],["online","Online booking","Reserva online"],["portals","Portals or platforms","Portales o plataformas"],["walk","In person","En persona"]]},
+   {id:"enquiries",type:"radio",en:"Enquiries and booking requests in a busy week",es:"Consultas y peticiones de reserva en una semana fuerte",opts:[["10","Under 20","Menos de 20"],["35","20 to 50","20 a 50"],["100","50 to 150","50 a 150"],["250","More than 150","Más de 150"]]},
+   {id:"missed",type:"radio",req:1,en:"Of those, how many go unanswered or get a reply too late?",es:"De esas, ¿cuántas quedan sin respuesta o se responden tarde?",hen:"Calls during service, messages at night, DMs nobody sees. A best guess is fine.",hes:"Llamadas en plena hora punta, mensajes de noche, DMs que nadie ve. Vale una estimación.",opts:[["0","Almost none","Casi ninguna"],["3","1 to 5","1 a 5"],["10","6 to 15","6 a 15"],["22","16 to 30","16 a 30"],["40","More than 30","Más de 30"]]},
+   {id:"replyTime",type:"radio",en:"How fast does a new enquiry usually get a reply?",es:"¿Con qué rapidez se responde normalmente a una consulta nueva?",opts:[["mins","Within minutes","En minutos"],["hour","Within the hour","En menos de una hora"],["day","Same day","El mismo día"],["later","Next day or later","Al día siguiente o más tarde"]]},
+   {id:"value",type:"number",en:"What is one new booking, sale or customer worth to you, on average?",es:"¿Cuánto vale de media para ti una reserva, venta o cliente nuevo?",hen:"In euros. Leave blank if unsure and we'll use a typical figure.",hes:"En euros. Déjalo en blanco si no lo sabes y usaremos una cifra típica."},
+   {id:"repeatQ",type:"textarea",en:"Which questions do customers ask again and again?",es:"¿Qué preguntas te hacen los clientes una y otra vez?",hen:"Opening hours, prices, availability, parking, allergens…",hes:"Horarios, precios, disponibilidad, aparcamiento, alérgenos…"}
+ ]},
+ {id:"ops",en:"How the work gets done",es:"Cómo se hace el trabajo",ien:"A few questions specific to your type of business.",ies:"Unas preguntas específicas de tu tipo de negocio.",qs:[
+   {id:"noshows",type:"radio",show:hasNoShows,en:"No-shows and late cancellations in a typical week",es:"Ausencias y cancelaciones tardías en una semana normal",opts:[["0","Almost none","Casi ninguna"],["2","1 to 3","1 a 3"],["6","4 to 8","4 a 8"],["12","More than 8","Más de 8"]]},
+   {id:"h_manual",type:"checks",show:isHosp,more:1,en:"Which of these are still done by hand?",es:"¿Cuáles de estas se hacen todavía a mano?",opts:[["groups","Group and event bookings","Reservas de grupos y eventos"],["sunbeds","Sunbed or table reservations","Reservas de hamacas o mesas"],["menu","Menu, allergen and translation updates","Cartas, alérgenos y traducciones"],["stock","Stock counts and supplier orders","Inventario y pedidos a proveedores"],["rota","Staff rotas","Turnos del personal"],["reviews","Replying to reviews","Responder reseñas"],["social","Social media posts","Publicaciones en redes"]]},
+   {id:"h_waste",type:"radio",show:isHosp,en:"How much stock gets wasted?",es:"¿Cuánto stock se desperdicia?",opts:[["low","Very little","Muy poco"],["some","Some, every week","Algo, cada semana"],["lots","Too much","Demasiado"],["unknown","I don't know","No lo sé"]]},
+   {id:"h_platforms",type:"radio",show:isHosp,en:"Booking or delivery platform commissions",es:"Comisiones de plataformas de reservas o reparto",opts:[["none","Don't use them","No las uso"],["fine","Use them, cost is fine","Las uso, el coste está bien"],["hurts","Use them, cost hurts","Las uso, el coste duele"]]},
+   {id:"r_sources",type:"checks",show:isRE,en:"Where do your leads come from?",es:"¿De dónde vienen tus contactos?",opts:[["idealista","Idealista","Idealista"],["fotocasa","Fotocasa","Fotocasa"],["kyero","Kyero","Kyero"],["rightmove","Rightmove Overseas","Rightmove Overseas"],["thinkspain","ThinkSpain","ThinkSpain"],["web","Own website","Web propia"],["social","Social media","Redes sociales"],["referral","Referrals","Recomendaciones"]]},
+   {id:"r_qualify",type:"radio",show:isRE,en:"How do you tell a serious buyer from someone just looking?",es:"¿Cómo distingues a un comprador serio de alguien que solo mira?",opts:[["gut","Gut feel","Intuición"],["questions","We ask set questions","Hacemos preguntas fijas"],["crm","Our CRM scores them","Nuestro CRM los puntúa"],["dont","We don't, everyone gets the same","No lo hacemos, todos igual"]]},
+   {id:"r_cold",type:"radio",show:isRE,en:"What happens to leads who go quiet?",es:"¿Qué pasa con los contactos que dejan de responder?",opts:[["nothing","Mostly nothing","Casi nada"],["manual","Manual follow-up when we remember","Seguimiento manual cuando nos acordamos"],["auto","Automated follow-up","Seguimiento automático"]]},
+   {id:"r_listing",type:"radio",show:isRE,en:"Time to get a new listing live with descriptions and translations",es:"Tiempo para publicar un inmueble nuevo con descripciones y traducciones",opts:[["day","Under a day","Menos de un día"],["days","2 to 3 days","2 a 3 días"],["week","About a week","Una semana"],["more","Longer","Más"]]},
+   {id:"r_agents",type:"radio",show:isRE,en:"Do your agents have more leads than they can handle?",es:"¿Tus agentes tienen más contactos de los que pueden atender?",opts:[["yes","Yes","Sí"],["peaks","At peak times","En temporada alta"],["no","No","No"]]},
+   {id:"a_booking",type:"radio",show:isAppt,en:"How are appointments, orders or stays booked?",es:"¿Cómo se reservan citas, pedidos o estancias?",opts:[["online","Online, self-service","Online, autoservicio"],["mixed","Mix of online and messages","Mezcla de online y mensajes"],["manual","Mostly by phone or message","Casi todo por teléfono o mensaje"]]},
+   {id:"a_return",type:"radio",show:isAppt,en:"How do you bring customers back?",es:"¿Cómo consigues que los clientes vuelvan?",opts:[["nothing","We wait for them","Esperamos a que vuelvan"],["manual","Manual reminders","Recordatorios manuales"],["auto","Automated reminders or offers","Recordatorios u ofertas automáticas"]]},
+   {id:"bottleneck",type:"textarea",en:"At your busiest moment, where does work pile up or get stuck?",es:"En tu momento de más trabajo, ¿dónde se acumula o se atasca el trabajo?"}
+ ]},
+ {id:"time",en:"Time and money",es:"Tiempo y dinero",ien:"Rough figures are fine.",ies:"Valen cifras aproximadas.",qs:[
+   {id:"adminHours",type:"radio",req:1,en:"Hours a week you and your team spend on admin, messages and paperwork",es:"Horas a la semana que tú y tu equipo dedicáis a administración, mensajes y papeleo",opts:[["2","Under 5","Menos de 5"],["8","5 to 10","5 a 10"],["15","10 to 20","10 a 20"],["30","More than 20","Más de 20"]]},
+   {id:"repetitive",type:"textarea",req:1,en:"Which job do you most wish would just do itself?",es:"¿Qué tarea te gustaría que se hiciera sola?",hen:"Be as specific as you like. This is the most useful answer in the audit.",hes:"Sé todo lo concreto que quieras. Es la respuesta más útil de la auditoría."},
+   {id:"leaks",type:"checks",en:"Where else do you think money slips away?",es:"¿Dónde más crees que se escapa el dinero?",opts:[["fees","Platform commissions","Comisiones de plataformas"],["staff","Staff overtime","Horas extra del personal"],["followup","No follow-up with past customers","Sin seguimiento a clientes anteriores"],["reviews","Bad or unanswered reviews","Reseñas malas o sin responder"],["errors","Admin mistakes","Errores administrativos"],["pricing","Pricing","Precios"],["unsure","Not sure","No lo sé"]]},
+   {id:"tried",type:"textarea",en:"What have you already tried to fix any of this, and why didn't it work?",es:"¿Qué has probado ya para arreglar algo de esto y por qué no funcionó?"}
+ ]},
+ {id:"next",en:"AI and what matters most",es:"La IA y lo más importante",ien:"Sceptical is welcome. Honest answers help most.",ies:"El escepticismo es bienvenido. Las respuestas sinceras ayudan más.",qs:[
+   {id:"aiUse",type:"radio",en:"Have you used AI tools such as ChatGPT or Claude?",es:"¿Has usado herramientas de IA como ChatGPT o Claude?",opts:[["never","Never","Nunca"],["tried","A few times","Alguna vez"],["sometimes","Sometimes","A veces"],["daily","Every day","A diario"]]},
+   {id:"aiWorry",type:"checks",en:"What worries you about AI in your business?",es:"¿Qué te preocupa de la IA en tu negocio?",more:1,opts:[["cost","Cost","El coste"],["personal","Losing the personal touch","Perder el trato personal"],["privacy","Customer data","Datos de clientes"],["complex","Too complicated","Demasiado complicado"],["staff","Staff won't use it","El personal no lo usará"],["mistakes","It might get things wrong","Que se equivoque"],["burnt","Tried tech before, didn't work","Ya probé tecnología y no funcionó"],["none","Nothing really","Nada en especial"]]},
+   {id:"top3",type:"checks",max:3,req:1,en:"Which three areas would you most like to improve?",es:"¿Qué tres áreas te gustaría mejorar más?",opts:[["replies","Replying to messages and calls","Responder mensajes y llamadas"],["afterhours","Out-of-hours enquiries","Consultas fuera de horario"],["bookings","Bookings and no-shows","Reservas y ausencias"],["leads","Following up leads","Seguimiento de contactos"],["website","Website","Web"],["reviews","Reviews and reputation","Reseñas y reputación"],["content","Social media content","Contenido para redes"],["stock","Stock and suppliers","Stock y proveedores"],["rota","Staff rotas","Turnos"],["admin","Admin and invoicing","Administración y facturación"],["reports","Knowing my numbers","Conocer mis cifras"],["translate","Translations","Traducciones"]]},
+   {id:"success",type:"textarea",en:"Three months from now, what would make you say this was worth it?",es:"Dentro de tres meses, ¿qué te haría decir que ha merecido la pena?"},
+   {id:"budget",type:"radio",en:"Monthly budget that would feel fair if it clearly paid for itself",es:"Presupuesto mensual razonable si claramente se paga solo",opts:[["<150","Under €150","Menos de 150 €"],["150-400","€150 to €400","150 € a 400 €"],["400-1000","€400 to €1,000","400 € a 1.000 €"],["1000+","Over €1,000","Más de 1.000 €"],["depends","Depends on the return","Depende del retorno"],["skip","Prefer not to say","Prefiero no decirlo"]]},
+   {id:"timing",type:"radio",en:"When would you want something in place?",es:"¿Para cuándo te gustaría tenerlo?",opts:[["now","As soon as possible","Lo antes posible"],["season","Before next season","Antes de la próxima temporada"],["exploring","Just exploring","Solo estoy explorando"]]},
+   {id:"prefer",type:"radio",en:"Best way to reach you",es:"Mejor forma de contactarte",opts:[["wa","WhatsApp","WhatsApp"],["call","Phone call","Llamada"],["email","Email","Email"],["visit","Visit in person","Visita en persona"]]},
+   {id:"askMe",type:"textarea",en:"What haven't we asked that we should have?",es:"¿Qué no te hemos preguntado que deberíamos?"}
+ ]}
+];
+
+/* Modules for recommendations */
+const MODULES = {
+  receptionist:{en:["Out-of-hours AI receptionist","Answers calls and messages 24/7 in your customers' languages, takes details and books them in."],es:["Recepcionista IA fuera de horario","Atiende llamadas y mensajes 24/7 en el idioma del cliente, toma los datos y reserva."]},
+  whatsapp:{en:["Instant WhatsApp and DM replies","Answers the questions you get every day in seconds, and hands anything tricky to you."],es:["Respuestas instantáneas en WhatsApp y DMs","Responde en segundos las preguntas de siempre y te pasa lo complicado."]},
+  noshow:{en:["Bookings, reminders and deposits","Online booking with automatic reminders and deposits to cut no-shows."],es:["Reservas, recordatorios y señales","Reserva online con recordatorios y señales automáticas para reducir ausencias."]},
+  leadscore:{en:["Buyer intent scoring and nurture","Ranks leads by how serious they are, so agents spend time on buyers who will buy, while AI nurtures the rest."],es:["Puntuación de compradores y seguimiento","Ordena los contactos por intención real para que los agentes atiendan a quien va a comprar, y la IA cuida al resto."]},
+  listings:{en:["Listing and translation assistant","Drafts property descriptions in several languages from your notes and photos."],es:["Asistente de anuncios y traducciones","Redacta descripciones de inmuebles en varios idiomas a partir de tus notas y fotos."]},
+  reviews:{en:["Review responder","Drafts a reply to every Google and TripAdvisor review for you to approve."],es:["Respuesta a reseñas","Prepara una respuesta a cada reseña de Google y TripAdvisor para que la apruebes."]},
+  content:{en:["Social content engine","A week of posts drafted from your photos and specials, in your voice."],es:["Motor de contenido para redes","Una semana de publicaciones a partir de tus fotos y novedades, con tu estilo."]},
+  stock:{en:["Stock and supplier assistant","Tracks usage, flags waste and drafts supplier orders."],es:["Asistente de stock y proveedores","Controla el consumo, detecta mermas y prepara pedidos."]},
+  rota:{en:["Smart rota planner","Builds rotas from bookings and seasonality, and handles swaps by message."],es:["Planificador de turnos","Crea los turnos según reservas y temporada, y gestiona cambios por mensaje."]},
+  admin:{en:["Admin and invoice automation","Reads receipts and invoices, files them and keeps your accountant happy."],es:["Automatización administrativa","Lee tickets y facturas, los archiva y facilita el trabajo a tu gestor."]},
+  dashboard:{en:["Owner's dashboard","Your key numbers in one place, every morning, without chasing anyone."],es:["Panel del propietario","Tus cifras clave en un sitio, cada mañana, sin perseguir a nadie."]},
+  website:{en:["Website that books","A fast, multilingual site that turns visits into bookings and enquiries."],es:["Web que reserva","Una web rápida y multilingüe que convierte visitas en reservas y consultas."]},
+  return:{en:["Bring-back campaigns","Automatic messages that bring past customers back at the right time."],es:["Campañas de vuelta","Mensajes automáticos que traen de vuelta a clientes anteriores en el momento justo."]}
+};
+
+let lang = "en", step = -1, A = {}, startedSent = false, lastPayload = null;
+const KEY = "adelante-audit-v2";
+const params = new URLSearchParams(location.search);
+const REF = (params.get("ref")||"").slice(0,60);
+try{ const s = JSON.parse(localStorage.getItem(KEY)||"null"); if(s){A=s.A||{}; lang=s.lang||lang; step=Math.min(s.step??-1,SECTIONS.length-1); startedSent=!!s.startedSent;} }catch(e){}
+if(params.get("business") && !A.business) A.business = params.get("business").slice(0,100);
+if(params.get("lang")==="es"||(!A.business&&!localStorageHas()&&(navigator.language||"").startsWith("es"))) lang="es";
+function localStorageHas(){ try{ return !!localStorage.getItem(KEY); }catch(e){ return false; } }
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify({A,lang,step,startedSent})); }catch(e){} };
+const t = k => UI[lang][k];
+const L = o => o[lang];
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const card = document.getElementById("card");
+const visible = q => !q.show || q.show(A);
+const tiles = (all) => `<div class="tiles" aria-hidden="true">${SECTIONS.map((_,i)=>`<span class="${all||i<step?'done':i===step?'now':''}"></span>`).join("")}</div>`;
+const eur = n => "€" + Math.round(n).toLocaleString(lang==="es"?"es-ES":"en-GB");
+
+function renderIntro(){
+  card.innerHTML = `${tiles()}<div class="eyebrow">${t("introEye")}</div><h1>${t("introH")}</h1><p class="lead">${t("introP")}</p>
+  <div class="promise"><div><b>${t("p1")}</b>${t("p1t")}</div><div><b>${t("p2")}</b>${t("p2t")}</div><div><b>${t("p3")}</b>${t("p3t")}</div></div>
+  <div class="nav"><span class="note">${t("saved")}</span><button class="btn primary" id="go">${t("start")}</button></div>`;
+  document.getElementById("go").onclick = () => { step=0; save(); render(); };
+}
+
+function field(q){
+  const id = "f_"+q.id, v = A[q.id], label = esc(L(q))+(q.req?' <span class="req" aria-hidden="true">*</span>':"");
+  const hint = q["h"+lang] ? `<span class="hint">${esc(q["h"+lang])}</span>` : "";
+  const more = q.more ? `<details class="more" ${A[q.id+"_more"]?"open":""}><summary>${t("more")}</summary><textarea id="${id}_more" aria-label="${esc(L(q))}">${esc(A[q.id+"_more"]||"")}</textarea></details>` : "";
+  if(["text","email","tel"].includes(q.type))
+    return `<label class="ql" for="${id}">${label}${hint}</label><input id="${id}" type="${q.type}" value="${esc(v||"")}" autocomplete="${q.ac||'off'}" ${q.req?'required':''}>`;
+  if(q.type==="number")
+    return `<label class="ql" for="${id}">${label}${hint}</label><div class="euro"><input id="${id}" type="number" inputmode="numeric" min="0" step="1" value="${esc(v||"")}"></div>`;
+  if(q.type==="textarea")
+    return `<label class="ql" for="${id}">${label}${hint}</label><textarea id="${id}">${esc(v||"")}</textarea>`;
+  if(q.type==="radio"||q.type==="checks"){
+    const multi = q.type==="checks", arr = multi?(v||[]):[v];
+    const maxH = q.max?`<span class="hint">${t("max")} ${q.max}</span>`:"";
+    return `<fieldset><legend>${label}${hint}${maxH}</legend><div class="chips">${q.opts.map(o=>
+      `<label class="chip"><input type="${multi?'checkbox':'radio'}" name="${id}" id="${id}_${o[0]}" value="${o[0]}" ${arr.includes(o[0])?"checked":""}><span>${esc(lang==="en"?o[1]:o[2])}</span></label>`).join("")}</div></fieldset>${more}`;
+  }
+  if(q.type==="consent")
+    return `<label class="consent"><input type="checkbox" id="${id}" ${v?"checked":""}><span>${esc(L(q))}</span></label>
+    <p class="privacy">${esc(t("privacy").replace("{ctl}",CONTROLLER).replace("{em}",CONTACT_EMAIL))}</p>
+    <div class="hp" aria-hidden="true"><label for="f_honey">Leave empty</label><input id="f_honey" type="text" tabindex="-1" autocomplete="off"></div>`;
+}
+
+function collect(){
+  SECTIONS[step].qs.forEach(q=>{
+    if(!visible(q)) return;
+    const id="f_"+q.id;
+    if(q.type==="checks") A[q.id]=[...document.querySelectorAll(`input[name="${id}"]:checked`)].map(i=>i.value);
+    else if(q.type==="radio"){ const c=document.querySelector(`input[name="${id}"]:checked`); A[q.id]=c?c.value:""; }
+    else if(q.type==="consent") A[q.id]=document.getElementById(id).checked;
+    else { const el=document.getElementById(id); if(el) A[q.id]=el.value.trim(); }
+    const m=document.getElementById(id+"_more"); if(m) A[q.id+"_more"]=m.value.trim();
+  });
+  const hp=document.getElementById("f_honey"); if(hp) A._honey=hp.value;
+  save();
+}
+
+function validate(){
+  let ok=true, first=null;
+  card.querySelectorAll(".err").forEach(e=>e.remove());
+  SECTIONS[step].qs.forEach(q=>{
+    if(!visible(q)) return;
+    const v=A[q.id]; let msg="";
+    if(q.req && (v===undefined||v===""||v===false||(Array.isArray(v)&&!v.length))) msg = q.type==="consent"?t("consentReq"):q.type==="tel"?t("phoneBad"):t("required");
+    else if(q.type==="email" && v && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) msg=t("emailBad");
+    else if(q.type==="tel" && v && v.replace(/\D/g,"").length<9) msg=t("phoneBad");
+    if(msg){ ok=false; const w=document.getElementById("q_"+q.id); w.insertAdjacentHTML("beforeend",`<div class="err" role="alert">${msg}</div>`); first=first||w; }
+  });
+  if(first){ first.scrollIntoView({behavior:"smooth",block:"center"}); first.querySelector("input,textarea")?.focus({preventScroll:true}); }
+  return ok;
+}
+
+function applyMax(form,q){ const boxes=[...form.querySelectorAll(`input[name="f_${q.id}"]`)]; const n=boxes.filter(b=>b.checked).length; boxes.forEach(b=>b.disabled=!b.checked&&n>=q.max); }
+
+function renderStep(){
+  const s=SECTIONS[step], last=step===SECTIONS.length-1;
+  card.innerHTML = `${tiles()}<div class="eyebrow">${t("step")} ${step+1} ${t("of")} ${SECTIONS.length}</div><h2>${esc(L(s))}</h2><p class="lead">${esc(lang==="en"?s.ien:s.ies)}</p>
+  <form id="form" novalidate><div class="qs">${s.qs.filter(visible).map(q=>`<div class="q" id="q_${q.id}">${field(q)}</div>`).join("")}</div>
+  <div class="nav">${step>0?`<button type="button" class="btn" id="back">${t("back")}</button>`:`<span></span>`}<button type="submit" class="btn primary" id="next">${last?t("send"):t("next")}</button></div></form>`;
+  const form=document.getElementById("form");
+  s.qs.forEach(q=>{ if(q.max) applyMax(form,q); });
+  form.addEventListener("change",e=>{
+    const name=e.target.name||"";
+    if(name==="f_website"){ collect(); renderStep(); document.getElementById("f_website_"+A.website)?.focus(); return; }
+    s.qs.forEach(q=>{ if(q.max && name==="f_"+q.id) applyMax(form,q); });
+  });
+  form.addEventListener("input",()=>{ clearTimeout(window._sv); window._sv=setTimeout(collect,400); });
+  const back=document.getElementById("back"); if(back) back.onclick=()=>{ collect(); step--; save(); render(); };
+  form.onsubmit=e=>{ e.preventDefault(); collect(); if(!validate()) return;
+    if(step===0 && !startedSent) sendStarted();
+    if(last) finish(); else { step++; save(); render(); card.scrollIntoView({block:"start"}); card.focus({preventScroll:true}); } };
+}
+
+/* ===== Scoring and estimate ===== */
+function estimate(){
+  const num = k => Number(A[k]||0);
+  const typed = Number(A.value);
+  const value = typed>0 ? typed : (DEFAULT_VALUE[A.sector]||80);
+  const missed = num("missed")*value*conv()*ASSUME.weeks;
+  const noshow = hasNoShows(A) ? num("noshows")*value*ASSUME.noshowRecover*ASSUME.weeks : 0;
+  const hours = num("adminHours")*ASSUME.adminAutomatable*ASSUME.weeks;
+  const admin = hours*ASSUME.hourly;
+  const total = missed+noshow+admin;
+  return {value, valueAssumed: !(typed>0), missed, noshow, admin, hours, total, low: total*0.6, high: total*1.3};
+}
+
+function leadScore(e){
+  let s=0;
+  if(["owner","partner"].includes(A.role)) s+=2;
+  s += {now:3,season:2,exploring:0}[A.timing]||0;
+  s += {"<150":1,"150-400":2,"400-1000":3,"1000+":3,"depends":2,"skip":1}[A.budget]||0;
+  s += e.total>30000?3:e.total>10000?2:e.total>3000?1:0;
+  s += (A.top3||[]).length?1:0;
+  if(["daily","sometimes"].includes(A.aiUse)) s+=1;
+  return {score:s, label: s>=9?"HOT":s>=5?"WARM":"COLD"};
+}
+
+function recommend(){
+  const want = new Set(A.top3||[]), pts = {};
+  const add = (k,n) => pts[k]=(pts[k]||0)+n;
+  const missed=Number(A.missed||0);
+  if(missed>=10 || want.has("afterhours")) add("receptionist",3+(missed>=22?2:0));
+  if(want.has("replies") || ["day","later"].includes(A.replyTime)) add("whatsapp",3);
+  if(want.has("bookings") || Number(A.noshows||0)>=6) add("noshow",3);
+  if(isRE(A)){ add("leadscore", 2+(want.has("leads")?3:0)+(A.r_qualify==="dont"||A.r_qualify==="gut"?2:0)+(A.r_agents==="yes"?2:0));
+    if(["week","more"].includes(A.r_listing)||want.has("translate")) add("listings",3); }
+  if(want.has("leads") && !isRE(A)) add("return",3);
+  if(isAppt(A) && A.a_return==="nothing") add("return",2);
+  if(want.has("reviews")) add("reviews",3);
+  if(want.has("content")) add("content",3);
+  if(want.has("stock") || A.h_waste==="lots") add("stock",3);
+  if(want.has("rota")) add("rota",3);
+  if(want.has("admin") || Number(A.adminHours||0)>=15) add("admin",3);
+  if(want.has("reports")) add("dashboard",3);
+  if(want.has("website") || A.website==="none") add("website",3);
+  if(want.has("translate") && !isRE(A)) add("whatsapp",1);
+  const order=Object.entries(pts).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+  ["whatsapp","dashboard","admin"].forEach(k=>{ if(!order.includes(k)) order.push(k); });
+  return order.slice(0,3);
+}
+
+/* ===== Payloads ===== */
+function label(q,v){ if(!q.opts) return v; const m=Object.fromEntries(q.opts.map(o=>[o[0],o[1]])); return Array.isArray(v)?v.map(x=>m[x]||x).join(", "):(m[v]||v); }
+function base(){ return {_captcha:"false",_template:"table",_honey:A._honey||"",_replyto:A.email||""}; }
+function contactBlock(){ return {"Business":A.business,"Name":A.name,"Role":label(SECTIONS[0].qs[2],A.role),"Sector":label(SECTIONS[0].qs[3],A.sector),"Email":A.email,"Phone / WhatsApp":A.phone,"Source (ref)":REF||"direct","Answered in":lang==="en"?"English":"Spanish"}; }
+
+async function post(payload){
+  const ctrl=new AbortController(); const tm=setTimeout(()=>ctrl.abort(),15000);
+  try{
+    const r=await fetch(SUBMIT_URL,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(payload),signal:ctrl.signal});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok || j.success===false || j.success==="false") throw new Error("rejected");
+    return true;
+  } finally { clearTimeout(tm); }
+}
+
+function sendStarted(){
+  startedSent=true; save();
+  const p=Object.assign(base(),{_subject:`[Adelante] Started: ${A.business} (${label(SECTIONS[0].qs[3],A.sector)})`},contactBlock(),
+    {"Status":"Started the audit. If no full submission follows, this is a warm lead to call.","Started at":new Date().toLocaleString("en-GB",{timeZone:"Europe/Madrid"})});
+  post(p).catch(()=>{ startedSent=false; save(); });
+}
+
+function fullPayload(e,ls,recs){
+  const p=Object.assign(base(),{_subject:`[Adelante] ${ls.label} lead: ${A.business} · est. ${eur(e.low)} to ${eur(e.high)} a year`},contactBlock());
+  p["Lead score"]=`${ls.label} (${ls.score}/15)`;
+  p["Estimated annual leak"]=`${eur(e.low)} to ${eur(e.high)} (midpoint ${eur(e.total)})`;
+  p["Value per customer used"]=`${eur(e.value)}${e.valueAssumed?" (sector default, not given)":""}`;
+  p["Breakdown"]=`Missed enquiries ${eur(e.missed)} · No-shows ${eur(e.noshow)} · Admin ${eur(e.admin)} (${Math.round(e.hours)} hours)`;
+  p["Suggested modules"]=recs.map(k=>MODULES[k].en[0]).join(" · ");
+  SECTIONS.forEach((s,i)=>{ if(i===0) return; s.qs.forEach(q=>{
+    if(!visible(q)) return; let v=A[q.id];
+    if(!(v===undefined||v===""||(Array.isArray(v)&&!v.length))) p[`${s.en} · ${q.en}`]=q.type==="number"?eur(v):label(q,v);
+    if(A[q.id+"_more"]) p[`${s.en} · ${q.en} (detail)`]=A[q.id+"_more"];
+  }); });
+  p["Consent"]=A.consent?"Yes":"No";
+  p["Submitted"]=new Date().toLocaleString("en-GB",{timeZone:"Europe/Madrid"});
+  return p;
+}
+const asText = p => Object.entries(p).filter(([k])=>!k.startsWith("_")).map(([k,v])=>`${k}\n${v}`).join("\n\n");
+
+async function finish(){
+  const btn=document.getElementById("next"); btn.disabled=true; btn.textContent=t("sending");
+  const e=estimate(), ls=leadScore(e), recs=recommend();
+  lastPayload=fullPayload(e,ls,recs);
+  let ok=false; try{ ok=await post(lastPayload); }catch(err){ ok=false; }
+  if(ok){ try{ localStorage.removeItem(KEY); }catch(x){} }
+  step=SECTIONS.length; renderResults(e,recs,ok);
+}
+
+function renderResults(e,recs,ok){
+  const a=t("resAssumeT").replace("{c}",Math.round(conv()*100)).replace("{n}",ASSUME.noshowRecover*100).replace("{h}",ASSUME.hourly).replace("{a}",ASSUME.adminAutomatable*100).replace("{w}",ASSUME.weeks);
+  const wa=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`${t("waMsg")} ${A.business||""}.`)}`;
+  const fail = ok?"":`<div class="result"><h3>${t("failH")}</h3><p class="lead">${t("failP")} <b style="user-select:all">${CONTACT_EMAIL}</b> · WhatsApp <b style="user-select:all">${WHATSAPP_SHOWN}</b></p>
+    <div class="fallback"><textarea id="dump" readonly aria-label="Answers">${esc(lastPayload._subject+"\n\n"+asText(lastPayload))}</textarea>
+    <div class="nav"><button class="btn" id="retry">${t("retry")}</button><button class="btn primary" id="copy">${t("copy")}</button></div></div></div>`;
+  card.innerHTML = `${tiles(true)}<div class="eyebrow">${t("resEye")}</div><h2>${t("resH")}</h2>${fail}
+  <div class="result"><div class="note">${t("resLeak")}</div><div class="big">${eur(e.low)} – ${eur(e.high)}</div><div class="note">${t("resRange")}</div>
+    <div class="breakdown"><div><span>${t("resB1")}</span><span>${eur(e.missed)}</span></div>
+    ${e.noshow?`<div><span>${t("resB2")}</span><span>${eur(e.noshow)}</span></div>`:""}
+    <div><span>${t("resB3")}</span><span>${eur(e.admin)} · ${Math.round(e.hours)} ${t("resHours")}</span></div></div></div>
+  <h3 style="margin-top:24px">${t("resMods")}</h3>
+  <div class="mods">${recs.map(k=>`<div class="mod"><i aria-hidden="true"></i><div><b>${esc(MODULES[k][lang][0])}</b><p>${esc(MODULES[k][lang][1])}</p></div></div>`).join("")}</div>
+  <details class="more" style="margin-top:20px"><summary>${t("resAssume")}</summary><p class="note">${esc(a)}</p></details>
+  <p class="lead" style="margin-top:20px">${t("resNext")}</p>
+  <div class="nav"><a class="btn wa" href="${wa}" target="_blank" rel="noopener">${t("wa")}</a></div>`;
+  card.scrollIntoView({block:"start"}); card.focus({preventScroll:true});
+  if(!ok){
+    document.getElementById("copy").onclick=async ev=>{ const ta=document.getElementById("dump"); try{ await navigator.clipboard.writeText(ta.value); ev.target.textContent=t("copied"); }catch(x){ ta.focus(); ta.select(); } };
+    document.getElementById("retry").onclick=async ev=>{ ev.target.disabled=true; let r=false; try{ r=await post(lastPayload); }catch(x){} if(r){ try{localStorage.removeItem(KEY);}catch(y){} } renderResults(e,recs,r); };
+  }
+}
+
+function render(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===lang));
+  document.getElementById("foot").textContent=t("foot");
+  if(step<0) renderIntro();
+  else if(step>=SECTIONS.length){ const e=estimate(); renderResults(e,recommend(),true); }
+  else renderStep();
+}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{ if(step>=0&&step<SECTIONS.length) collect(); lang=b.dataset.lang; save(); render(); });
+render();
+</script>
+
+</body>
+</html>
