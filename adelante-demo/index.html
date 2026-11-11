@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Adelante Portal Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Layout idea: phone-first app shell. Welcome mode (Fraunces, terracotta, arches) for invitations, count mode (Inter, azulejo, square tiles) for every number. */
-  --whitewash:#FBF7F0;--surface:#FFFFFF;--border:#EADFD0;--carob:#2A1E17;--muted:#5C4E44;
-  --terracotta:#B4532A;--on-terracotta:#FFFFFF;--azulejo:#2E3A6B;--tint:#E9E4F0;--olive:#5E6B3A;
-  --alert:#A3261E;--alert-bg:#FBECEA;--ok:#2F6B45;--ok-bg:#E8F2EA;
+  /* Layout idea: a control room. Carob sidebar and carob 3D stage frame a whitewash workspace; terracotta invites action, azulejo carries every number. Sidebar on laptop, bottom bar on phone. */
+  --whitewash:#FBF7F0;--surface:#FFFFFF;--border:#EADFD0;--carob:#2A1E17;--carob-2:#34271F;--carob-3:#4A3B30;--muted:#5C4E44;--on-carob:#FBF7F0;--on-carob-muted:#CBBFB2;
+  --terracotta:#B4532A;--terracotta-l:#E08A63;--azulejo:#2E3A6B;--azulejo-l:#A9B6E8;--tint:#E9E4F0;--olive:#5E6B3A;
+  --alert:#A3261E;--alert-bg:#FBECEA;--ok:#2F6B45;--ok-bg:#E8F2EA;--warm-bg:#FAEEE7;
+  --shadow:0 1px 2px rgba(42,30,23,.05),0 10px 28px rgba(42,30,23,.07);
   --display:Fraunces,Georgia,serif;--sans:Inter,system-ui,sans-serif;
   color-scheme:light;
 }
@@ -19,57 +20,92 @@
 html,body{margin:0;background:var(--whitewash);color:var(--carob);font-family:var(--sans);font-size:15px;line-height:1.5}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--azulejo);outline-offset:2px}
-.app{max-width:760px;margin:0 auto;padding:0 16px 150px}
-header{display:flex;align-items:center;gap:10px;padding:14px 0 12px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:10px;flex:1;min-width:190px}
-.wm{font-family:var(--display);font-weight:700;font-size:24px;line-height:1}
-.wm small{display:block;font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.12em;color:var(--azulejo);margin-top:4px}
-.pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--muted);white-space:nowrap}
-.pill.demo{color:var(--olive)}
-.lang{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--carob);background:transparent;font-weight:600;font-size:13px}
-h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.1;margin:10px 0 8px;text-wrap:balance}
-h2{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.15;margin:26px 0 10px;text-wrap:balance}
-h3{font-size:15px;font-weight:700;margin:0 0 4px}
+svg.ic{flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.shell{min-height:100vh}
+aside{display:none}
+.top{display:flex;align-items:center;gap:10px;padding:12px 16px;position:sticky;top:0;background:var(--whitewash);z-index:4;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;flex:1}
+.wm{font-family:var(--display);font-weight:700;font-size:22px;line-height:1}
+.wm small{display:block;font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.12em;color:var(--azulejo);margin-top:3px}
+.pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--olive);white-space:nowrap}
+.lang{min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--carob);background:transparent;font-weight:600;font-size:13px}
+main{padding:18px 16px 110px;max-width:1220px;margin:0 auto}
+h1{font-family:var(--display);font-weight:700;font-size:28px;line-height:1.1;margin:0 0 6px;text-wrap:balance}
+h2{font-size:16px;font-weight:700;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+h3{font-size:15px;font-weight:600;margin:0}
 p{margin:0 0 10px}
-.lead{color:var(--muted);max-width:60ch}
-.lbl{font-size:12px;font-weight:600;color:var(--olive);letter-spacing:.04em;text-transform:uppercase}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px}
-.stack{display:flex;flex-direction:column;gap:12px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.fig{font-size:30px;font-weight:700;line-height:1.05;color:var(--azulejo);font-variant-numeric:tabular-nums}
+.lead{color:var(--muted);max-width:62ch}
+.lbl{font-size:11px;font-weight:700;color:var(--olive);letter-spacing:.07em;text-transform:uppercase}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sb{justify-content:space-between}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);text-align:left;display:block;width:100%}
+.kpi.hot{border-color:var(--terracotta);background:var(--warm-bg)}
+.fig{font-size:28px;font-weight:700;line-height:1.1;color:var(--azulejo);font-variant-numeric:tabular-nums}
+.kpi.hot .fig{color:var(--terracotta)}
 .fig.bad{color:var(--alert)}
 .cap{font-size:13px;color:var(--muted)}
 .num{font-variant-numeric:tabular-nums;font-weight:600;color:var(--azulejo)}
-.sl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
-.sl label{font-size:14px}
-.sl output{font-weight:700;color:var(--azulejo);font-variant-numeric:tabular-nums}
-.sl input{grid-column:1/-1;width:100%;accent-color:var(--terracotta);height:32px}
-.btn{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--terracotta);background:var(--terracotta);color:var(--on-terracotta);font-weight:600}
+.btn{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--terracotta);background:var(--terracotta);color:#fff;font-weight:600;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .btn.ghost{background:transparent;color:var(--terracotta)}
 .btn.quiet{border-color:var(--border);background:var(--surface);color:var(--carob)}
 .btn.sm{min-height:40px;padding:0 14px;font-size:14px}
-.tool{border:1.5px dashed var(--alert);border-radius:2px;padding:10px;background:var(--surface)}
-.tool b{display:block;font-size:14px}
-.tool span{font-size:13px;color:var(--alert)}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chip{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);white-space:nowrap;font-size:14px;font-weight:600}
-.chip[aria-pressed="true"]{background:var(--azulejo);border-color:var(--azulejo);color:#fff}
-.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:2px;background:var(--tint);color:var(--azulejo)}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:2px;background:var(--tint);color:var(--azulejo)}
 .tag.warn{background:var(--alert-bg);color:var(--alert)}
 .tag.ok{background:var(--ok-bg);color:var(--ok)}
 .tag.ol{background:#EEF0E4;color:var(--olive)}
+.tag.hot{background:var(--warm-bg);color:var(--terracotta)}
 .item{border-top:1px solid var(--border);padding:12px 0}
 .item:first-child{border-top:0;padding-top:0}
 .item:last-child{padding-bottom:0}
+.need{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start}
+.need .dot{width:36px;height:36px;border-radius:2px;background:var(--warm-bg);color:var(--terracotta);display:grid;place-items:center}
 .quote{background:var(--whitewash);border-radius:2px;padding:8px 10px;margin:6px 0;font-size:14px}
 .draft{border-left:3px solid var(--azulejo);padding:6px 10px;margin:6px 0;font-size:14px;background:var(--tint)}
 textarea{width:100%;min-height:92px;font:inherit;font-size:14px;padding:10px;border:1px solid var(--azulejo);border-radius:2px;background:#fff;color:var(--carob)}
 .bar{height:10px;background:var(--tint);border-radius:2px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--azulejo);border-radius:2px}
-.bar.bad i{background:var(--alert)}
 .alertc{border-color:var(--alert);background:var(--alert-bg)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);white-space:nowrap;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.chip[aria-pressed="true"]{background:var(--azulejo);border-color:var(--azulejo);color:#fff}
+.chip .n{font-size:11px;min-width:18px;height:18px;border-radius:9px;background:var(--terracotta);color:#fff;display:inline-grid;place-items:center;padding:0 5px}
+.pa{background:var(--carob);color:var(--on-carob);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.pa h2{color:var(--on-carob)}
+.pa .chip{background:transparent;border-color:var(--carob-3);color:var(--on-carob);font-weight:500}
+.pa .chip[aria-pressed="true"]{background:var(--on-carob);color:var(--carob);border-color:var(--on-carob)}
+.pa .ans{font-family:var(--display);font-size:17px;line-height:1.4;margin:12px 0 0;padding-top:12px;border-top:1px solid var(--carob-3)}
+.feed{display:grid;grid-template-columns:48px 1fr;gap:4px 10px;font-size:14px}
+.feed time{color:var(--azulejo);font-weight:600;font-variant-numeric:tabular-nums}
+.stagecard{background:var(--carob);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);color:var(--on-carob)}
+.stagehead{padding:14px 16px 10px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.stagehead h2{margin:0;color:var(--on-carob)}
+.stagehead .cap{color:var(--on-carob-muted);flex-basis:100%;margin:0}
+.seg{display:inline-flex;border:1px solid var(--carob-3);border-radius:999px;overflow:hidden}
+.seg button{min-height:36px;padding:0 14px;border:0;background:transparent;font-weight:600;font-size:13px;color:var(--on-carob-muted)}
+.seg button[aria-pressed="true"]{background:var(--on-carob);color:var(--carob)}
+#stage{position:relative;height:360px;overflow:hidden;background:var(--carob)}
+#stage canvas{display:block;width:100%;height:100%;touch-action:pan-y;cursor:grab}
+.nl{position:absolute;left:0;top:0;transform:translate(-999px,-999px);padding:2px 7px;border-radius:2px;border:0;background:rgba(42,30,23,.82);color:var(--on-carob);font-size:11px;font-weight:600;white-space:nowrap;display:flex;gap:5px;align-items:center}
+.nl .n{min-width:16px;height:16px;border-radius:8px;background:var(--terracotta-l);color:var(--carob);font-size:10px;display:inline-grid;place-items:center;padding:0 4px}
+.nl.off{color:#F0A9A2}
+.nl.dim{opacity:.3}
+.nl.sel{background:var(--on-carob);color:var(--carob)}
+.sys{padding:14px 16px 16px;border-top:1px solid var(--carob-3)}
+.sys .tag{background:var(--carob-3);color:var(--azulejo-l)}
+.sys .tag.warn{background:#5A2A25;color:#F0A9A2}
+.sys .tag.hot{background:#5A3626;color:var(--terracotta-l)}
+.sys .tag.ok{background:#2F4A39;color:#B9DDC5}
+.sys .lbl{color:var(--on-carob-muted)}
+.sys p{color:var(--on-carob)}
+.sys .chip{background:transparent;border-color:var(--carob-3);color:var(--on-carob);min-height:36px;font-size:13px;font-weight:500}
+.sys .chip[aria-pressed="true"]{background:var(--azulejo-l);border-color:var(--azulejo-l);color:var(--carob)}
+.sys .btn{background:var(--terracotta-l);border-color:var(--terracotta-l);color:var(--carob)}
+.hgrid{display:flex;flex-direction:column;gap:14px}
+.hgrid .col{display:contents}
+#h-needs{order:1}.stagecard{order:2}#h-pa{order:3}#h-feed{order:4}
 .ev{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--border)}
 .ev:first-child{border-top:0}
 .ev time{font-weight:700;color:var(--azulejo);font-variant-numeric:tabular-nums}
@@ -78,147 +114,165 @@ textarea{width:100%;min-height:92px;font:inherit;font-size:14px;padding:10px;bor
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;border:1px solid var(--border);transition:left .15s}
 .sw[aria-checked="true"]{background:var(--azulejo);border-color:var(--azulejo)}
 .sw[aria-checked="true"]::after{left:23px}
-#stage{position:relative;height:360px;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--whitewash)}
-#stage canvas{display:block;width:100%;height:100%;touch-action:none}
-.nl{position:absolute;left:0;top:0;transform:translate(-999px,-999px);padding:3px 8px;border-radius:2px;border:1px solid var(--azulejo);background:var(--surface);color:var(--azulejo);font-size:12px;font-weight:600;white-space:nowrap;margin:-34px 0 0 0}
-.nl.off{border-color:var(--alert);color:var(--alert);border-style:dashed}
-.nl.dim{opacity:.3}
-.nl.sel{background:var(--azulejo);color:#fff;border-style:solid;border-color:var(--azulejo)}
-.seg{display:inline-flex;border:1px solid var(--carob);border-radius:999px;overflow:hidden}
-.seg button{min-height:40px;padding:0 16px;border:0;background:transparent;font-weight:600;font-size:14px}
-.seg button[aria-pressed="true"]{background:var(--carob);color:var(--whitewash)}
+.sl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+.sl label{font-size:14px}
+.sl output{font-weight:700;color:var(--azulejo);font-variant-numeric:tabular-nums}
+.sl input{grid-column:1/-1;width:100%;accent-color:var(--terracotta);height:32px}
 .ba{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.ba>div{border-radius:2px;padding:12px;background:var(--surface);border:1px solid var(--border)}
-.ba>div.after{border-color:var(--azulejo)}
-nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);z-index:5}
-nav div{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-nav button{min-height:58px;border:0;background:transparent;font-size:12px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px}
-nav button b{font-size:13px;width:22px;height:22px;border-radius:2px;background:var(--tint);color:var(--azulejo);display:grid;place-items:center}
-nav button[aria-current="page"]{color:var(--carob)}
-nav button[aria-current="page"] b{background:var(--azulejo);color:#fff}
-#tour{position:fixed;left:0;right:0;bottom:calc(59px + env(safe-area-inset-bottom));z-index:6;padding:0 12px 8px;pointer-events:none}
-#tour>div{max-width:736px;margin:0 auto;background:var(--carob);color:var(--whitewash);border-radius:16px;padding:12px 14px;pointer-events:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-#tour p{margin:0;flex:1;min-width:200px;font-size:14px}
-#tour button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--whitewash);background:transparent;color:var(--whitewash);font-weight:600;font-size:14px}
-#tour button.go{background:var(--whitewash);color:var(--carob)}
-section[hidden]{display:none}
+.ba>div{border-radius:2px;padding:12px;background:var(--whitewash);border:1px solid var(--border)}
+.ba>div.after{border-color:var(--azulejo);background:var(--surface)}
+.two{display:grid;gap:14px}
 details summary{cursor:pointer;font-weight:600;color:var(--terracotta);min-height:40px;display:flex;align-items:center}
-code{font-size:13px;background:var(--whitewash);padding:1px 5px;border-radius:2px}
+#bnav{position:fixed;left:0;right:0;bottom:0;background:var(--carob);padding-bottom:env(safe-area-inset-bottom);z-index:6;display:grid;grid-template-columns:repeat(5,1fr)}
+#bnav button{min-height:60px;border:0;background:transparent;font-size:11px;font-weight:600;color:var(--on-carob-muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative}
+#bnav button[aria-current="page"]{color:var(--terracotta-l)}
+#bnav .n,.snav .n{font-size:10px;min-width:16px;height:16px;border-radius:8px;background:var(--terracotta-l);color:var(--carob);display:inline-grid;place-items:center;padding:0 4px}
+#bnav .n{position:absolute;top:8px;left:calc(50% + 6px)}
+#sheet{position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));background:var(--carob-2);z-index:5;padding:10px 12px;display:grid;gap:6px;border-radius:16px 16px 0 0}
+#sheet[hidden]{display:none}
+#sheet button{min-height:48px;border:0;border-radius:8px;background:transparent;color:var(--on-carob);font-weight:600;display:flex;align-items:center;gap:10px;padding:0 12px;text-align:left}
+section[hidden]{display:none}
 a{color:var(--terracotta)}
-@media (min-width:620px){h1{font-size:40px}.tools{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:640px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}h1{font-size:34px}#stage{height:420px}}
+@media (min-width:980px){
+  .shell{display:grid;grid-template-columns:232px minmax(0,1fr)}
+  aside{display:flex;flex-direction:column;gap:6px;background:var(--carob);color:var(--on-carob);padding:20px 14px;position:sticky;top:0;height:100vh}
+  aside .brand{flex:none}aside .wm{color:var(--on-carob)}aside .wm small{color:var(--azulejo-l)}
+  .snav{display:flex;flex-direction:column;gap:2px;margin-top:22px;flex:1}
+  .snav button{min-height:42px;border:0;border-radius:8px;background:transparent;color:var(--on-carob-muted);font-weight:600;font-size:14px;display:flex;align-items:center;gap:10px;padding:0 12px;text-align:left}
+  .snav button span.t{flex:1}
+  .snav button:hover{background:var(--carob-2)}
+  .snav button[aria-current="page"]{background:var(--carob-3);color:var(--on-carob)}
+  aside .pill{background:transparent;border-color:var(--carob-3);color:var(--on-carob-muted);align-self:flex-start}
+  aside .lang{border-color:var(--carob-3);color:var(--on-carob);align-self:flex-start;margin-top:8px}
+  .top,#bnav,#sheet{display:none!important}
+  main{padding:28px 32px 60px}
+  .hgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}
+  .hgrid .col{display:flex;flex-direction:column;gap:14px}
+  #stage{height:440px}
+  .two{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="app">
-<header>
+<div class="shell">
+<aside>
   <div class="brand">
-    <svg width="40" height="40" viewBox="0 0 120 120" role="img" aria-label="Adelante Doorway mark"><path d="M18 110V54a42 42 0 0 1 84 0v56H84V54a24 24 0 0 0-48 0v56Z" fill="#B4532A"/><rect x="40" y="66" width="18" height="18" rx="2" fill="#2E3A6B"/><rect x="62" y="66" width="18" height="18" rx="2" fill="#E9E4F0"/><rect x="40" y="88" width="18" height="18" rx="2" fill="#E9E4F0"/><rect x="62" y="88" width="18" height="18" rx="2" fill="#2E3A6B"/></svg>
+    <svg width="38" height="38" viewBox="0 0 120 120" role="img" aria-label="Adelante Doorway mark"><path d="M18 110V54a42 42 0 0 1 84 0v56H84V54a24 24 0 0 0-48 0v56Z" fill="#E08A63"/><rect x="40" y="66" width="18" height="18" rx="2" fill="#A9B6E8"/><rect x="62" y="66" width="18" height="18" rx="2" fill="#4A3B30"/><rect x="40" y="88" width="18" height="18" rx="2" fill="#4A3B30"/><rect x="62" y="88" width="18" height="18" rx="2" fill="#A9B6E8"/></svg>
     <div class="wm">adelante<small>BY VYRE</small></div>
   </div>
-  <span class="pill demo" id="demoPill"></span>
-  <button class="lang" data-a="lang" id="langBtn"></button>
-</header>
+  <div class="snav" id="snav"></div>
+  <span class="pill" data-t="demo"></span>
+  <button class="lang" data-a="lang" data-t="langBtn"></button>
+</aside>
+<div>
+<div class="top">
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 120 120" role="img" aria-label="Adelante Doorway mark"><path d="M18 110V54a42 42 0 0 1 84 0v56H84V54a24 24 0 0 0-48 0v56Z" fill="#B4532A"/><rect x="40" y="66" width="18" height="18" rx="2" fill="#2E3A6B"/><rect x="62" y="66" width="18" height="18" rx="2" fill="#E9E4F0"/><rect x="40" y="88" width="18" height="18" rx="2" fill="#E9E4F0"/><rect x="62" y="88" width="18" height="18" rx="2" fill="#2E3A6B"/></svg>
+    <div class="wm">adelante<small>BY VYRE</small></div>
+  </div>
+  <span class="pill" data-t="demoShort"></span>
+  <button class="lang" data-a="lang" data-t="langShort"></button>
+</div>
 <main>
-  <section id="v-today"></section>
-  <section id="v-portal" hidden></section>
-  <section id="v-connections" hidden>
-    <div id="c-top"></div>
-    <div id="stage"><canvas id="cv" aria-hidden="true"></canvas></div>
-    <div id="c-bottom"></div>
+  <section id="v-home">
+    <div id="h-head"></div>
+    <div class="hgrid">
+      <div class="col"><div id="h-needs" class="card"></div><div id="h-pa" class="pa"></div><div id="h-feed" class="card"></div></div>
+      <div class="col"><div class="stagecard"><div class="stagehead" id="h-stagehead"></div><div id="stage"><canvas id="cv" aria-hidden="true"></canvas></div><div class="sys" id="h-sys"></div></div></div>
+    </div>
   </section>
-  <section id="v-outcome" hidden></section>
+  <section id="v-inbox" hidden></section>
+  <section id="v-diary" hidden></section>
+  <section id="v-sales" hidden></section>
+  <section id="v-operations" hidden></section>
+  <section id="v-finance" hidden></section>
+  <section id="v-numbers" hidden></section>
 </main>
 </div>
-<div id="tour"></div>
-<nav aria-label="Demo sections"><div id="navIn"></div></nav>
+</div>
+<div id="sheet" hidden></div>
+<nav id="bnav" aria-label="Portal sections"></nav>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
 "use strict";
-var VIEWS=['today','portal','connections','outcome'];
-var S={lang:'en',view:'today',enq:40,miss:30,val:85,conv:25,admin:14,rec:70,adm:40,tab:'brief',connected:false,node:null,mod:null,tour:1,clash:false};
+var VIEWS=['home','inbox','diary','sales','operations','finance','numbers'];
+var S={lang:'en',view:'home',enq:40,miss:30,val:85,conv:25,admin:14,rec:70,adm:40,connected:true,node:null,mod:null,clash:false,filt:'all',pa:'urgent',sheet:false};
+var IC={home:'M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6',inbox:'M4 5h16v14H4zM4 13h5l1 3h4l1-3h5',diary:'M4 6h16v14H4zM4 10h16M8 3v5M16 3v5',sales:'M4 20V10M10 20V4M16 20v-8M22 20H2',operations:'M12 8a4 4 0 100 8 4 4 0 000-8zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2',finance:'M17 6a6 6 0 100 12M4 10h9M4 14h9',numbers:'M4 7h10M18 7h2M4 17h2M10 17h10M16 4v6M8 14v6',more:'M5 12h.01M12 12h.01M19 12h.01',
+gmail:'M3 6h18v12H3zM3 7l9 7 9-7',wa:'M4 5h16v11H9l-5 4z',ig:'M4 4h16v16H4zM12 8a4 4 0 100 8 4 4 0 000-8zM17 7h.01',cal:'M4 6h16v14H4zM4 10h16M8 3v5M16 3v5',book:'M4 7h16v4a2 2 0 000 4v3H4v-3a2 2 0 000-4z',crm:'M12 4a4 4 0 100 8 4 4 0 000-8zM4 20c0-4 4-6 8-6s8 2 8 6',pay:'M3 6h18v12H3zM3 10h18M7 15h4',acc:'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7',drive:'M3 6h7l2 3h9v10H3z',
+check:'M5 12l5 5 9-10',spark:'M12 3v6M12 15v6M3 12h6M15 12h6',bell:'M6 16V11a6 6 0 0112 0v5l2 2H4zM10 20h4',arrow:'M5 12h14M13 6l6 6-6 6'};
+function ic(n,s){s=s||18;return '<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" aria-hidden="true"><path d="'+IC[n]+'"/></svg>'}
 
 var T={en:{
-demo:'Demo only · sample data',langBtn:'Español',
-nav:['Today','Your portal','Connections','Outcome'],
-tour:['Start with your own numbers. Move the sliders to match a normal week.','This is how your portal would look. Every button works. Approve a reply, fix the clash.','See how your systems join up. Drag to turn, tap a system, switch between today and connected.','Your before and after, from the numbers you entered.'],
-next:'Next',skip:'Skip tour',finish:'Finish',
-t_h:'What a normal week costs you',t_lead:'Casa Serena is an invented wellbeing studio. Swap in your own numbers and the whole demo follows them.',
-s_enq:'Enquiries a week',s_miss:'Answered late or missed',s_val:'Average booking value',s_conv:'Of those, how many would have booked',s_admin:'Admin hours a week',
-t_lostRev:'Estimated revenue lost a month',t_lostY:'a year',t_lostEnq:'enquiries a month answered late or missed',t_hours:'Admin hours a month',t_hoursY:'hours a year',
-t_formula:'How this is worked out',t_f1:'Late or missed enquiries a month = enquiries a week × late or missed % × 4.33 weeks.',t_f2:'Revenue lost a month = those enquiries × share that would have booked × average booking value.',t_f3:'Admin hours a month = admin hours a week × 4.33. These are estimates from your inputs, not measured results.',
-t_tools:'Where your day lives now',t_toolsLead:'Six places, none of them talking to each other.',
-tools:[['Email','waiting for a reply'],['WhatsApp','waiting for a reply'],['Instagram','waiting for a reply'],['Calendars','3 calendars, checked by hand'],['Booking system','not linked to your contacts'],['Spreadsheets','updated by hand']],
-t_cta:'Open your portal',
-p_h:'Good morning, Casa Serena',p_lead:'One place for messages, diary, sales, operations and money. Your team approves every message.',
-tabs:{brief:'Briefing',inbox:'Inbox',cal:'Calendar',sales:'Sales',ops:'Operations',fin:'Finance',time:'Time saved'},
-b_24:'Last 24 hours',b_drafted:'replies drafted',b_wait:'waiting for your approval',b_clash:'diary clash',b_inv:'money items to check',
-b_alert:'Needs you today',b_alertTxt:'A corporate retreat enquiry worth about €2,400 has waited 26 hours. A reply is drafted and ready to approve.',b_alertBtn:'Open the reply',
-b_actions:'Your actions for today',b_a1:'Approve drafted replies',b_a2:'Fix the 10:00 teacher clash',b_a3:'Call your warmest lead',b_a4:'Check flagged invoices',b_done:'All clear. Nothing waiting on you.',go:'Go',
-i_lead:'Email, WhatsApp and Instagram in one list. Each reply is drafted for you. Nothing leaves without your approval.',i_draft:'Drafted reply',approve:'Approve',edit:'Edit',reject:'Reject',save:'Save draft',
-i_ok:'Approved. In the live tool this goes out from your own account.',i_no:'Rejected. Left for you to answer by hand.',undo:'Undo',
-c_lead:'Class bookings, staff rota and your own diary, merged into one day.',c_day:'Thursday',c_src:{book:'Bookings',rota:'Rota',own:'Your diary'},
-c_clash:'Clash found',c_clashTxt:'Lucía is down to teach Reformer Pilates at 10:00 and has an appointment in her own calendar at the same time. Marta is free and qualified.',c_fix:'Swap in Marta',c_fixed:'Resolved. Marta teaches at 10:00. A note to the 6 booked clients is drafted for your approval.',
-sa_lead:'Each lead is scored on real interest, so your time goes to the people ready to book. The rest are nurtured for you.',sa_gen:'Genuine interest',sa_look:'Just looking',sa_next:'Next best step',sa_do:'Mark done',sa_done:'Done',
-o_auto:'Running for you',o_runs:'runs this week (sample)',o_exc:'Needs a person',o_res:'Resolve',o_resd:'Resolved',
-f_lead:'Invoices are collected from email and uploads, checked against your agreed prices, and passed to your accountant.',f_flag:'Flagged for you',f_inv:'Invoiced',f_con:'Agreed',f_diff:'Difference',f_q:'Draft the query',f_qd:'Query drafted for your approval',f_total:'Flagged and in hand',f_of:'of',f_found:'found',
-ti_lead:'Every hour handed back is logged, so you can see the return build week by week.',ti_w:'This week',ti_m:'This month',ti_y:'This year',ti_note:'Based on your admin hours and the share handled for you. Change either on the Outcome screen.',hrs:'hrs',
-k_h:'How it all connects',k_lead:'Today each system keeps its own copy of the truth. Connected, they share one.',k_before:'Today',k_after:'Connected',k_hint:'Drag to turn · pinch or scroll to zoom · tap a system',
-k_mods:'Modules on the Doorway',k_modHint:'Tap a module to see the systems it draws on.',k_pick:'Tap a system to see what it shares and the pain it removes.',k_shares:'What it shares',k_used:'Used by',k_pain:'Pain it removes',k_nogl:'3D view is not available on this device. Use the list below.',
+demo:'Demo only · sample data',demoShort:'Demo',langBtn:'Ver en español',langShort:'ES',
+nav:{home:'Home',inbox:'Inbox',diary:'Diary',sales:'Sales',operations:'Operations',finance:'Finance',numbers:'Your numbers'},more:'More',
+h_hi:'Good morning, Casa Serena',h_sum1:'Your assistant handled',h_sum2:'jobs overnight.',h_sum3:'need you.',h_sumClear:'Nothing needs you right now.',h_note:'Casa Serena is an invented studio. Everything here is sample data, and every button works.',
+k_need:'Need you now',k_ready:'Replies ready to approve',k_hours:'Hours handed back this week',k_money:'Money flagged to recover',
+n_h:'Needs you now',n_clear:'All clear. Your assistant has the rest.',
+n_retreat:'Northpoint Ltd: retreat enquiry, about €2,400, waiting 26 hours',n_replies:'replies drafted and waiting',n_clash:'Lucía is double-booked at 10:00. Marta is free and qualified.',n_call:'Call Northpoint Ltd today. Your warmest lead.',n_inv:'money items flagged',n_exc:'decisions only you can make',
+approve:'Approve',review:'Review',swap:'Swap in Marta',done:'Mark done',open:'Open',
+pa_h:'Ask your assistant',pa_q:{urgent:'What is urgent?',missed:'What did I miss?',call:'Who should I call?',money:'Where is money leaking?'},
+pa_urgent0:'Nothing urgent. Everything waiting on you is done.',pa_urgentA:'Right now:',pa_missed:'Overnight I drafted 5 replies in two languages, sent 6 class reminders, refilled 1 cancelled space from the waiting list and checked 3 invoices against your agreed prices.',pa_call:'Northpoint Ltd. They scored 91 for genuine interest and want a retreat for 14. Offer the 14th and 15th of March.',pa_callDone:'Northpoint is done. Next is Hotel Alameda, after your 12:30 call.',pa_money:'in three places: a linen invoice above the agreed price, card fees above your agreed rate, and one unpaid invoice at 41 days.',pa_moneyDone:'Every flagged item has a query drafted. Nothing else is leaking today.',
+f_h:'Handled for you',f_sample:'Sample activity',
+feed:[['07:30','Morning briefing prepared'],['07:12','6 class reminders sent for today'],['06:40','Waiting list filled 1 cancelled space'],['23:15','Linen invoice checked against agreed price and flagged'],['22:48','5 replies drafted in English and Spanish']],
+st_h:'Your systems, live',st_hint:'Drag to turn · pinch to zoom · tap a system',st_before:'Before',st_after:'Connected',st_nogl:'3D view is not available here. Use the system list below.',
+st_pick:'Tap a system to see what needs you there.',st_off:'Not connected',st_need:'needs you',st_ok:'All clear',st_pain:'The problem today',st_shares:'What it shares',st_used:'Used by',st_mods:'Modules',
 mods:{reply:'Reply',follow:'Follow-up',content:'Content',back:'Back office'},
-out_h:'Before and after, on your numbers',out_lead:'Nothing here is a promise. It is your inputs, with two assumptions you can change.',
-a_rec:'Late or missed enquiries now answered in time',a_adm:'Admin handled for you',
+i_h:'Inbox',i_lead:'Email, WhatsApp and Instagram in one list. Each reply is drafted for you. Nothing leaves without your approval.',i_all:'All',i_draft:'Drafted reply',edit:'Edit',reject:'Reject',save:'Save draft',i_ok:'Approved. In the live tool this goes out from your own account.',i_no:'Rejected. Left for you to answer by hand.',undo:'Undo',i_none:'Nothing here.',
+c_h:'Diary',c_lead:'Class bookings, staff rota and your own diary, merged into one day.',c_day:'Thursday',c_src:{book:'Bookings',rota:'Rota',own:'Your diary'},c_clash:'Clash found',c_clashTxt:'Lucía is down to teach Reformer Pilates at 10:00 and has an appointment in her own calendar at the same time. Marta is free and qualified.',c_fixed:'Resolved. Marta teaches at 10:00. A note to the 6 booked clients is drafted for your approval.',
+sa_h:'Sales',sa_lead:'Each lead is scored on real interest, so your time goes to the people ready to book. The rest are nurtured for you.',sa_gen:'Genuine interest',sa_look:'Just looking',sa_next:'Next best step',sa_done:'Done',
+o_h:'Operations',o_auto:'Running for you',o_runs:'runs this week (sample)',o_exc:'Needs a person',o_res:'Resolve',o_resd:'Resolved',
+fi_h:'Finance',fi_lead:'Invoices are collected from email and uploads, checked against your agreed prices, and passed to your accountant.',fi_flag:'Flagged for you',fi_inv:'Invoiced',fi_con:'Agreed',fi_diff:'Difference',fi_q:'Draft the query',fi_qd:'Query drafted for your approval',fi_total:'Flagged and in hand',fi_of:'of',fi_found:'found',
+nu_h:'Your numbers',nu_lead:'Swap in a normal week for your business. The whole portal follows these figures. Nothing here is a promise.',nu_in:'Your week today',nu_as:'Two assumptions you can change',
+s_enq:'Enquiries a week',s_miss:'Answered late or missed',s_val:'Average booking value',s_conv:'Of those, how many would have booked',s_admin:'Admin hours a week',a_rec:'Late or missed enquiries now answered in time',a_adm:'Admin handled for you',
 out_b:'Today',out_a:'With Adelante',out_rev:'Revenue',out_revB:'lost a year',out_revA:'recovered a year',out_hrs:'Admin time',out_hrsB:'hours a year',out_hrsA:'hours returned a year',out_rt:'Response time',out_rtB:'answered late or missed',out_rtA:'Replies drafted in minutes, approved by your team',
-out_note:'Savings are measured and reported once live, with a time-saved tracker. Multilingual from day one.',
-out_cta:'Come in, let’s talk',out_ctaTxt:'Start with a free audit of the three jobs that eat your week.',out_btn:'Start your free audit',out_mail:'Or write to dean@vyrehq.com'
+t_formula:'How this is worked out',t_f1:'Late or missed enquiries a month = enquiries a week × late or missed % × 4.33 weeks.',t_f2:'Revenue lost a month = those enquiries × share that would have booked × average booking value.',t_f3:'Hours returned = admin hours × the share handled for you. These are estimates from your inputs, not measured results.',
+out_note:'Once live, savings are measured and reported with a time-saved tracker. Multilingual from day one.',
+out_cta:'Come in, let’s talk',out_ctaTxt:'Start with a free audit of the three jobs that eat your week.',out_btn:'Start your free audit',out_mail:'Or write to dean@vyrehq.com',hrs:'hrs'
 },es:{
-demo:'Solo demo · datos de ejemplo',langBtn:'English',
-nav:['Hoy','Tu portal','Conexiones','Resultado'],
-tour:['Empieza con tus propias cifras. Mueve los controles hasta que se parezcan a una semana normal.','Así se vería tu portal. Todos los botones funcionan. Aprueba una respuesta, resuelve el solapamiento.','Mira cómo se unen tus sistemas. Arrastra para girar, toca un sistema y cambia entre hoy y conectado.','Tu antes y después, con las cifras que has introducido.'],
-next:'Siguiente',skip:'Saltar',finish:'Terminar',
-t_h:'Lo que te cuesta una semana normal',t_lead:'Casa Serena es un estudio de bienestar inventado. Pon tus cifras y toda la demo se adapta.',
-s_enq:'Consultas a la semana',s_miss:'Respondidas tarde o sin responder',s_val:'Valor medio de una reserva',s_conv:'De esas, cuántas habrían reservado',s_admin:'Horas de gestión a la semana',
-t_lostRev:'Ingresos perdidos al mes (estimación)',t_lostY:'al año',t_lostEnq:'consultas al mes respondidas tarde o sin responder',t_hours:'Horas de gestión al mes',t_hoursY:'horas al año',
-t_formula:'Cómo se calcula',t_f1:'Consultas tardías o perdidas al mes = consultas a la semana × % tardías o perdidas × 4,33 semanas.',t_f2:'Ingresos perdidos al mes = esas consultas × parte que habría reservado × valor medio de la reserva.',t_f3:'Horas de gestión al mes = horas a la semana × 4,33. Son estimaciones a partir de tus datos, no resultados medidos.',
-t_tools:'Dónde vive hoy tu día a día',t_toolsLead:'Seis sitios que no se hablan entre sí.',
-tools:[['Correo','esperando respuesta'],['WhatsApp','esperando respuesta'],['Instagram','esperando respuesta'],['Calendarios','3 calendarios, revisados a mano'],['Sistema de reservas','sin conexión con tus contactos'],['Hojas de cálculo','actualizadas a mano']],
-t_cta:'Abre tu portal',
-p_h:'Buenos días, Casa Serena',p_lead:'Un solo sitio para mensajes, agenda, ventas, operaciones y dinero. Tu equipo aprueba cada mensaje.',
-tabs:{brief:'Resumen',inbox:'Bandeja',cal:'Agenda',sales:'Ventas',ops:'Operaciones',fin:'Finanzas',time:'Tiempo ahorrado'},
-b_24:'Últimas 24 horas',b_drafted:'respuestas redactadas',b_wait:'pendientes de tu aprobación',b_clash:'solapamiento en agenda',b_inv:'asuntos de dinero por revisar',
-b_alert:'Te necesita hoy',b_alertTxt:'Una consulta para un retiro de empresa, de unos 2.400 €, lleva 26 horas esperando. La respuesta está redactada y lista para aprobar.',b_alertBtn:'Ver la respuesta',
-b_actions:'Tus tareas de hoy',b_a1:'Aprobar las respuestas redactadas',b_a2:'Resolver el solapamiento de las 10:00',b_a3:'Llamar a tu contacto más interesado',b_a4:'Revisar las facturas marcadas',b_done:'Todo en orden. No hay nada pendiente de ti.',go:'Ir',
-i_lead:'Correo, WhatsApp e Instagram en una sola lista. Cada respuesta te llega redactada. Nada sale sin tu aprobación.',i_draft:'Respuesta redactada',approve:'Aprobar',edit:'Editar',reject:'Rechazar',save:'Guardar',
-i_ok:'Aprobada. En la herramienta real se envía desde tu propia cuenta.',i_no:'Rechazada. Queda para que respondas a mano.',undo:'Deshacer',
-c_lead:'Reservas de clases, turnos del equipo y tu agenda personal, en un solo día.',c_day:'Jueves',c_src:{book:'Reservas',rota:'Turnos',own:'Tu agenda'},
-c_clash:'Solapamiento detectado',c_clashTxt:'Lucía tiene la clase de Pilates Reformer a las 10:00 y una cita en su calendario personal a la misma hora. Marta está libre y cualificada.',c_fix:'Poner a Marta',c_fixed:'Resuelto. Marta da la clase de las 10:00. Hay un aviso redactado para las 6 personas con reserva, pendiente de tu aprobación.',
-sa_lead:'Cada contacto se puntúa según su interés real, para que dediques tu tiempo a quien está listo para reservar. Al resto se le da seguimiento por ti.',sa_gen:'Interés real',sa_look:'Solo mirando',sa_next:'Siguiente paso',sa_do:'Marcar hecho',sa_done:'Hecho',
-o_auto:'En marcha para ti',o_runs:'ejecuciones esta semana (ejemplo)',o_exc:'Necesita a una persona',o_res:'Resolver',o_resd:'Resuelto',
-f_lead:'Las facturas se recogen del correo y de lo que subas, se comparan con los precios acordados y se envían a tu gestoría.',f_flag:'Marcado para ti',f_inv:'Facturado',f_con:'Acordado',f_diff:'Diferencia',f_q:'Redactar la reclamación',f_qd:'Reclamación redactada, pendiente de tu aprobación',f_total:'Marcado y en curso',f_of:'de',f_found:'detectados',
-ti_lead:'Cada hora que recuperas queda registrada, para que veas cómo crece el retorno semana a semana.',ti_w:'Esta semana',ti_m:'Este mes',ti_y:'Este año',ti_note:'Según tus horas de gestión y la parte que se hace por ti. Puedes cambiar ambas en la pantalla de Resultado.',hrs:'h',
-k_h:'Cómo se conecta todo',k_lead:'Hoy cada sistema guarda su propia versión. Conectados, comparten una sola.',k_before:'Hoy',k_after:'Conectado',k_hint:'Arrastra para girar · pellizca o desplaza para acercar · toca un sistema',
-k_mods:'Módulos del Portal',k_modHint:'Toca un módulo para ver de qué sistemas se alimenta.',k_pick:'Toca un sistema para ver qué comparte y qué problema quita.',k_shares:'Qué comparte',k_used:'Lo usan',k_pain:'El problema que quita',k_nogl:'La vista 3D no está disponible en este dispositivo. Usa la lista de abajo.',
+demo:'Solo demo · datos de ejemplo',demoShort:'Demo',langBtn:'View in English',langShort:'EN',
+nav:{home:'Inicio',inbox:'Bandeja',diary:'Agenda',sales:'Ventas',operations:'Operaciones',finance:'Finanzas',numbers:'Tus cifras'},more:'Más',
+h_hi:'Buenos días, Casa Serena',h_sum1:'Tu asistente se ha ocupado de',h_sum2:'tareas esta noche.',h_sum3:'te necesitan.',h_sumClear:'Ahora mismo no hay nada pendiente de ti.',h_note:'Casa Serena es un estudio inventado. Todo son datos de ejemplo y todos los botones funcionan.',
+k_need:'Te necesitan ahora',k_ready:'Respuestas listas para aprobar',k_hours:'Horas recuperadas esta semana',k_money:'Dinero marcado para recuperar',
+n_h:'Te necesita ahora',n_clear:'Todo en orden. Tu asistente se ocupa del resto.',
+n_retreat:'Northpoint Ltd: consulta de retiro, unos 2.400 €, 26 horas esperando',n_replies:'respuestas redactadas y en espera',n_clash:'Lucía tiene dos cosas a las 10:00. Marta está libre y cualificada.',n_call:'Llama hoy a Northpoint Ltd. Es tu contacto más interesado.',n_inv:'asuntos de dinero marcados',n_exc:'decisiones que solo puedes tomar tú',
+approve:'Aprobar',review:'Revisar',swap:'Poner a Marta',done:'Marcar hecho',open:'Abrir',
+pa_h:'Pregunta a tu asistente',pa_q:{urgent:'¿Qué es urgente?',missed:'¿Qué me he perdido?',call:'¿A quién llamo?',money:'¿Dónde se escapa dinero?'},
+pa_urgent0:'Nada urgente. Todo lo que dependía de ti está hecho.',pa_urgentA:'Ahora mismo:',pa_missed:'Esta noche he redactado 5 respuestas en dos idiomas, enviado 6 recordatorios de clase, cubierto 1 plaza cancelada con la lista de espera y comprobado 3 facturas con tus precios acordados.',pa_call:'A Northpoint Ltd. Tienen 91 puntos de interés real y quieren un retiro para 14 personas. Ofréceles el 14 y 15 de marzo.',pa_callDone:'Northpoint ya está. El siguiente es Hotel Alameda, tras tu llamada de las 12:30.',pa_money:'en tres sitios: una factura de lencería por encima del precio acordado, comisiones de tarjeta por encima de tu tarifa y una factura sin cobrar desde hace 41 días.',pa_moneyDone:'Todo lo marcado tiene ya su reclamación redactada. Hoy no se escapa nada más.',
+f_h:'Hecho por ti',f_sample:'Actividad de ejemplo',
+feed:[['07:30','Resumen de la mañana preparado'],['07:12','6 recordatorios de clase enviados para hoy'],['06:40','La lista de espera cubrió 1 plaza cancelada'],['23:15','Factura de lencería comprobada con el precio acordado y marcada'],['22:48','5 respuestas redactadas en inglés y español']],
+st_h:'Tus sistemas, en directo',st_hint:'Arrastra para girar · pellizca para acercar · toca un sistema',st_before:'Antes',st_after:'Conectado',st_nogl:'La vista 3D no está disponible aquí. Usa la lista de sistemas.',
+st_pick:'Toca un sistema para ver qué te necesita ahí.',st_off:'Sin conectar',st_need:'te necesitan',st_ok:'Todo en orden',st_pain:'El problema hoy',st_shares:'Qué comparte',st_used:'Lo usan',st_mods:'Módulos',
 mods:{reply:'Respuesta',follow:'Seguimiento',content:'Contenido',back:'Gestión interna'},
-out_h:'Antes y después, con tus cifras',out_lead:'Aquí no hay promesas. Son tus datos, con dos supuestos que puedes cambiar.',
-a_rec:'Consultas tardías o perdidas que ahora se responden a tiempo',a_adm:'Gestión que se hace por ti',
+i_h:'Bandeja',i_lead:'Correo, WhatsApp e Instagram en una sola lista. Cada respuesta te llega redactada. Nada sale sin tu aprobación.',i_all:'Todo',i_draft:'Respuesta redactada',edit:'Editar',reject:'Rechazar',save:'Guardar',i_ok:'Aprobada. En la herramienta real se envía desde tu propia cuenta.',i_no:'Rechazada. Queda para que respondas a mano.',undo:'Deshacer',i_none:'Aquí no hay nada.',
+c_h:'Agenda',c_lead:'Reservas de clases, turnos del equipo y tu agenda personal, en un solo día.',c_day:'Jueves',c_src:{book:'Reservas',rota:'Turnos',own:'Tu agenda'},c_clash:'Solapamiento detectado',c_clashTxt:'Lucía tiene la clase de Pilates Reformer a las 10:00 y una cita en su calendario personal a la misma hora. Marta está libre y cualificada.',c_fixed:'Resuelto. Marta da la clase de las 10:00. Hay un aviso redactado para las 6 personas con reserva, pendiente de tu aprobación.',
+sa_h:'Ventas',sa_lead:'Cada contacto se puntúa según su interés real, para que dediques tu tiempo a quien está listo para reservar. Al resto se le da seguimiento por ti.',sa_gen:'Interés real',sa_look:'Solo mirando',sa_next:'Siguiente paso',sa_done:'Hecho',
+o_h:'Operaciones',o_auto:'En marcha para ti',o_runs:'ejecuciones esta semana (ejemplo)',o_exc:'Necesita a una persona',o_res:'Resolver',o_resd:'Resuelto',
+fi_h:'Finanzas',fi_lead:'Las facturas se recogen del correo y de lo que subas, se comparan con los precios acordados y se envían a tu gestoría.',fi_flag:'Marcado para ti',fi_inv:'Facturado',fi_con:'Acordado',fi_diff:'Diferencia',fi_q:'Redactar la reclamación',fi_qd:'Reclamación redactada, pendiente de tu aprobación',fi_total:'Marcado y en curso',fi_of:'de',fi_found:'detectados',
+nu_h:'Tus cifras',nu_lead:'Pon una semana normal de tu negocio. Todo el portal sigue estas cifras. Aquí no hay promesas.',nu_in:'Tu semana hoy',nu_as:'Dos supuestos que puedes cambiar',
+s_enq:'Consultas a la semana',s_miss:'Respondidas tarde o sin responder',s_val:'Valor medio de una reserva',s_conv:'De esas, cuántas habrían reservado',s_admin:'Horas de gestión a la semana',a_rec:'Consultas tardías o perdidas que ahora se responden a tiempo',a_adm:'Gestión que se hace por ti',
 out_b:'Hoy',out_a:'Con Adelante',out_rev:'Ingresos',out_revB:'perdidos al año',out_revA:'recuperados al año',out_hrs:'Tiempo de gestión',out_hrsB:'horas al año',out_hrsA:'horas recuperadas al año',out_rt:'Tiempo de respuesta',out_rtB:'respondidas tarde o sin responder',out_rtA:'Respuestas redactadas en minutos y aprobadas por tu equipo',
+t_formula:'Cómo se calcula',t_f1:'Consultas tardías o perdidas al mes = consultas a la semana × % tardías o perdidas × 4,33 semanas.',t_f2:'Ingresos perdidos al mes = esas consultas × parte que habría reservado × valor medio de la reserva.',t_f3:'Horas recuperadas = horas de gestión × la parte que se hace por ti. Son estimaciones a partir de tus datos, no resultados medidos.',
 out_note:'Una vez en marcha, el ahorro se mide y se informa con un registro de tiempo ahorrado. Multilingüe desde el primer día.',
-out_cta:'Pasa y hablamos',out_ctaTxt:'Empieza con una auditoría gratuita de las tres tareas que se comen tu semana.',out_btn:'Pide tu auditoría gratuita',out_mail:'O escribe a dean@vyrehq.com'
+out_cta:'Pasa y hablamos',out_ctaTxt:'Empieza con una auditoría gratuita de las tres tareas que se comen tu semana.',out_btn:'Pide tu auditoría gratuita',out_mail:'O escribe a dean@vyrehq.com',hrs:'h'
 }};
 function t(k){return T[S.lang][k]}
 function L(o){return typeof o==='string'?o:o[S.lang]}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function eur(n){return new Intl.NumberFormat(S.lang==='es'?'es-ES':'en-GB',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Math.round(n))}
-function int(n){return new Intl.NumberFormat(S.lang==='es'?'es-ES':'en-GB').format(Math.round(n))}
+function loc(){return S.lang==='es'?'es-ES':'en-GB'}
+function eur(n){return new Intl.NumberFormat(loc(),{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Math.round(n))}
+function int(n){return new Intl.NumberFormat(loc()).format(Math.round(n))}
+function $(id){return document.getElementById(id)}
 
 var msgs=[
-{id:1,ch:'Email',who:'Northpoint Ltd',q:{en:'We are 14 people looking for a two-day wellbeing retreat in March. Do you host private groups?',es:'Somos 14 personas y buscamos un retiro de bienestar de dos días en marzo. ¿Organizáis grupos privados?'},d:{en:'Thank you for thinking of us. Yes, we host private groups of up to 16. March has two free weekends. Shall I hold the 14th and 15th while we talk through what you would like?',es:'Gracias por pensar en nosotros. Sí, organizamos grupos privados de hasta 16 personas. En marzo tenemos dos fines de semana libres. ¿Os reservo el 14 y el 15 mientras vemos qué os gustaría?'},st:'p'},
-{id:2,ch:'WhatsApp',who:'Ingrid S.',q:{en:'Hi, is the Saturday morning yoga suitable for beginners?',es:'Hola, ¿la clase de yoga del sábado por la mañana es apta para principiantes?'},d:{en:'Hi Ingrid, yes, Saturday at 9:30 is an open-level class and a good place to start. There are 4 spaces left. Would you like me to hold one for you?',es:'Hola, Ingrid. Sí, la del sábado a las 9:30 es una clase abierta a todos los niveles y es buena para empezar. Quedan 4 plazas. ¿Te guardo una?'},st:'p'},
-{id:3,ch:'Instagram',who:'@marta.vives',q:{en:'Do you sell gift vouchers?',es:'¿Tenéis tarjetas regalo?'},d:{en:'We do. Vouchers start at a single class and can be sent by email the same day. Who is it for? I can suggest the right one.',es:'Sí. Hay desde una clase suelta y se pueden enviar por correo el mismo día. ¿Para quién es? Te recomiendo la más adecuada.'},st:'p'},
-{id:4,ch:'WhatsApp',who:'Tom R.',q:{en:'Need to move my Thursday massage, sorry. Anything Friday afternoon?',es:'Tengo que cambiar el masaje del jueves, lo siento. ¿Hay algo el viernes por la tarde?'},d:{en:'No problem, Tom. Friday has 15:00 or 16:30 free. Which suits you? I will move it as soon as you say.',es:'Sin problema, Tom. El viernes hay hueco a las 15:00 o a las 16:30. ¿Cuál te viene mejor? Lo cambio en cuanto me digas.'},st:'p'},
-{id:5,ch:'Email',who:'Hotel Alameda',q:{en:'Could you send your rates for weekly guest classes at the hotel?',es:'¿Podéis enviarnos tarifas para clases semanales para huéspedes en el hotel?'},d:{en:'Happy to. So I send the right proposal, how many guests per class do you expect, and do you have a room or would it be outdoors?',es:'Encantados. Para enviaros la propuesta adecuada, ¿cuántos huéspedes esperáis por clase y contáis con sala o sería al aire libre?'},st:'p'}];
+{id:1,ch:'Email',k:'gmail',who:'Northpoint Ltd',q:{en:'We are 14 people looking for a two-day wellbeing retreat in March. Do you host private groups?',es:'Somos 14 personas y buscamos un retiro de bienestar de dos días en marzo. ¿Organizáis grupos privados?'},d:{en:'Thank you for thinking of us. Yes, we host private groups of up to 16. March has two free weekends. Shall I hold the 14th and 15th while we talk through what you would like?',es:'Gracias por pensar en nosotros. Sí, organizamos grupos privados de hasta 16 personas. En marzo tenemos dos fines de semana libres. ¿Os reservo el 14 y el 15 mientras vemos qué os gustaría?'},st:'p'},
+{id:2,ch:'WhatsApp',k:'wa',who:'Ingrid S.',q:{en:'Hi, is the Saturday morning yoga suitable for beginners?',es:'Hola, ¿la clase de yoga del sábado por la mañana es apta para principiantes?'},d:{en:'Hi Ingrid, yes, Saturday at 9:30 is an open-level class and a good place to start. There are 4 spaces left. Would you like me to hold one for you?',es:'Hola, Ingrid. Sí, la del sábado a las 9:30 es una clase abierta a todos los niveles y es buena para empezar. Quedan 4 plazas. ¿Te guardo una?'},st:'p'},
+{id:3,ch:'Instagram',k:'ig',who:'@marta.vives',q:{en:'Do you sell gift vouchers?',es:'¿Tenéis tarjetas regalo?'},d:{en:'We do. Vouchers start at a single class and can be sent by email the same day. Who is it for? I can suggest the right one.',es:'Sí. Hay desde una clase suelta y se pueden enviar por correo el mismo día. ¿Para quién es? Te recomiendo la más adecuada.'},st:'p'},
+{id:4,ch:'WhatsApp',k:'wa',who:'Tom R.',q:{en:'Need to move my Thursday massage, sorry. Anything Friday afternoon?',es:'Tengo que cambiar el masaje del jueves, lo siento. ¿Hay algo el viernes por la tarde?'},d:{en:'No problem, Tom. Friday has 15:00 or 16:30 free. Which suits you? I will move it as soon as you say.',es:'Sin problema, Tom. El viernes hay hueco a las 15:00 o a las 16:30. ¿Cuál te viene mejor? Lo cambio en cuanto me digas.'},st:'p'},
+{id:5,ch:'Email',k:'gmail',who:'Hotel Alameda',q:{en:'Could you send your rates for weekly guest classes at the hotel?',es:'¿Podéis enviarnos tarifas para clases semanales para huéspedes en el hotel?'},d:{en:'Happy to. So I send the right proposal, how many guests per class do you expect, and do you have a room or would it be outdoors?',es:'Encantados. Para enviaros la propuesta adecuada, ¿cuántos huéspedes esperáis por clase y contáis con sala o sería al aire libre?'},st:'p'}];
 var evs=[
 {h:'08:00',t:{en:'Sunrise yoga · Marta · 9 booked',es:'Yoga al amanecer · Marta · 9 reservas'},s:'book'},
 {h:'10:00',t:{en:'Reformer Pilates · Lucía · 6 booked',es:'Pilates Reformer · Lucía · 6 reservas'},s:'book',c:1},
@@ -241,250 +295,262 @@ var excs=[
 {t:{en:'Refund request over your limit: needs your decision.',es:'Solicitud de devolución por encima de tu límite: necesita tu decisión.'}},
 {t:{en:'A client asked something the studio has no policy for: late arrival to a retreat.',es:'Una clienta pregunta algo sin política definida: llegada tarde a un retiro.'}}];
 var invs=[
-{who:'Linen supplier',t:{en:'Towel service, October',es:'Servicio de toallas, octubre'},a:486,c:420},
-{who:'Card payments',t:{en:'Card fee charged at 1.9%, agreed 1.4%',es:'Comisión de tarjeta al 1,9 %, acordada al 1,4 %'},a:266,c:196},
-{who:'Hotel Alameda',t:{en:'Your invoice unpaid for 41 days',es:'Tu factura sin cobrar desde hace 41 días'},a:640,c:0}];
+{who:{en:'Linen supplier',es:'Proveedor de lencería'},k:'acc',t:{en:'Towel service, October',es:'Servicio de toallas, octubre'},a:486,c:420},
+{who:{en:'Card payments',es:'Pagos con tarjeta'},k:'pay',t:{en:'Card fee charged at 1.9%, agreed 1.4%',es:'Comisión de tarjeta al 1,9 %, acordada al 1,4 %'},a:266,c:196},
+{who:'Hotel Alameda',k:'acc',t:{en:'Your invoice unpaid for 41 days',es:'Tu factura sin cobrar desde hace 41 días'},a:640,c:0}];
+var MODS={reply:['gmail','wa','ig'],follow:['crm','wa','gmail','cal'],content:['ig','drive'],back:['book','pay','acc','drive','cal']};
+var NODES=[
+{id:'gmail',v:'inbox',n:{en:'Email',es:'Correo'},s:{en:'Enquiries, supplier invoices, client threads.',es:'Consultas, facturas de proveedores, conversaciones con clientes.'},p:{en:'Enquiries buried under everything else, answered a day late.',es:'Consultas enterradas entre todo lo demás, respondidas un día tarde.'}},
+{id:'wa',v:'inbox',n:'WhatsApp',s:{en:'Client messages, booking changes, quick questions.',es:'Mensajes de clientes, cambios de reserva, dudas rápidas.'},p:{en:'Messages sitting on one person’s phone, unseen when they are off.',es:'Mensajes en el móvil de una sola persona, sin ver cuando libra.'}},
+{id:'ig',v:'inbox',n:'Instagram',s:{en:'Direct messages and comments that are really enquiries.',es:'Mensajes directos y comentarios que en realidad son consultas.'},p:{en:'Enquiries lost in a feed nobody checks during classes.',es:'Consultas perdidas en una red que nadie mira durante las clases.'}},
+{id:'cal',v:'diary',n:{en:'Calendars',es:'Calendarios'},s:{en:'Staff availability, your own diary, room use.',es:'Disponibilidad del equipo, tu agenda, uso de salas.'},p:{en:'Double bookings found on the morning, not the week before.',es:'Solapamientos que se descubren esa mañana, no la semana anterior.'}},
+{id:'book',v:'diary',n:{en:'Bookings',es:'Reservas'},s:{en:'Classes, spaces left, waiting lists, no-shows.',es:'Clases, plazas libres, listas de espera, ausencias.'},p:{en:'Cancelled spaces staying empty while a waiting list exists.',es:'Plazas canceladas que se quedan vacías habiendo lista de espera.'}},
+{id:'crm',v:'sales',n:{en:'Clients',es:'Clientes'},s:{en:'Who each person is, what they asked, what they bought.',es:'Quién es cada persona, qué preguntó, qué compró.'},p:{en:'Typing the same client into three places, and still missing history.',es:'Escribir al mismo cliente en tres sitios y aun así perder el historial.'}},
+{id:'pay',v:'finance',n:{en:'Payments',es:'Pagos'},s:{en:'Card takings, fees charged, refunds.',es:'Cobros con tarjeta, comisiones, devoluciones.'},p:{en:'Card fees drifting above the agreed rate with nobody checking.',es:'Comisiones de tarjeta por encima de lo acordado sin que nadie lo revise.'}},
+{id:'acc',v:'finance',n:{en:'Accounts',es:'Contabilidad'},s:{en:'Invoices in and out, what is owed, what is due.',es:'Facturas emitidas y recibidas, lo que te deben, lo que debes.'},p:{en:'A shoebox of invoices sent to the accountant at quarter end.',es:'Una caja de facturas enviada a la gestoría al cierre del trimestre.'}},
+{id:'drive',v:'operations',n:{en:'Files',es:'Archivos'},s:{en:'Price lists, policies, photos, templates.',es:'Tarifas, políticas, fotos, plantillas.'},p:{en:'Old price lists sent out because nobody could find the new one.',es:'Tarifas antiguas enviadas porque nadie encontraba la nueva.'}}];
+
+function pend(k){return msgs.filter(function(m){return m.st==='p'&&(!k||m.k===k)}).length}
+function invOpen(k){return invs.filter(function(i){return !i.done&&(!k||i.k===k)})}
+function excOpen(){return excs.filter(function(e){return !e.done}).length}
+function hotOpen(){return leads.filter(function(l){return l.sc>=60&&!l.done}).length}
+function invSum(){var s=0;invOpen().forEach(function(v){s+=v.a-v.c});return s}
+function needs(){return pend()+(S.clash?0:1)+(leads[0].done?0:1)+invOpen().length+excOpen()}
+function sysCount(id){return id==='gmail'||id==='wa'||id==='ig'?pend(id):id==='cal'?(S.clash?0:1):id==='crm'?hotOpen():id==='pay'||id==='acc'?invOpen(id).length:id==='drive'?excOpen():0}
+function navCount(v){return v==='inbox'?pend():v==='diary'?(S.clash?0:1):v==='sales'?hotOpen():v==='operations'?excOpen():v==='finance'?invOpen().length:0}
 
 function calc(){
-var le=S.enq*S.miss/100*4.33,lr=le*S.conv/100*S.val,am=S.admin*4.33,hw=S.admin*S.adm/100,w=S.enq*S.miss/100;
-return{lostEnqM:int(le),lostRevM:eur(lr),lostRevY:eur(lr*12),adminM:int(am),adminY:int(S.admin*52),recRevY:eur(lr*12*S.rec/100),hrsW:(Math.round(hw*10)/10).toLocaleString(S.lang==='es'?'es-ES':'en-GB'),hrsM:int(hw*4.33),hrsY:int(hw*52),
-wEmail:int(w*.4),wWa:int(w*.45),wIg:int(w*.15),miss:S.miss+'%',
-_rec:S.rec,_adm:S.adm};}
+var le=S.enq*S.miss/100*4.33,lr=le*S.conv/100*S.val,hw=S.admin*S.adm/100;
+return{lostEnqM:int(le),lostRevM:eur(lr),lostRevY:eur(lr*12),adminY:int(S.admin*52),recRevY:eur(lr*12*S.rec/100),hrsW:(Math.round(hw*10)/10).toLocaleString(loc()),hrsM:int(hw*4.33),hrsY:int(hw*52),miss:S.miss+'%',_rec:S.rec,_adm:S.adm};}
 function upd(){var c=calc();
 document.querySelectorAll('[data-n]').forEach(function(e){e.textContent=c[e.getAttribute('data-n')]});
 document.querySelectorAll('[data-w]').forEach(function(e){e.style.width=c[e.getAttribute('data-w')]+'%'});}
 var SUF={enq:'',miss:'%',val:' €',conv:'%',admin:'',rec:'%',adm:'%'};
 function sl(k,min,max,step,label){return '<div class="sl"><label for="s-'+k+'">'+label+'</label><output id="o-'+k+'">'+S[k]+SUF[k]+'</output><input type="range" id="s-'+k+'" data-s="'+k+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+S[k]+'"></div>';}
 
-function rToday(){
-var tl=t('tools'),keys=['wEmail','wWa','wIg'];
-document.getElementById('v-today').innerHTML=
-'<h1>'+t('t_h')+'</h1><p class="lead">'+t('t_lead')+'</p>'+
-'<div class="card stack" style="margin-top:14px">'+sl('enq',5,300,5,t('s_enq'))+sl('miss',0,80,5,t('s_miss'))+sl('val',20,600,5,t('s_val'))+sl('conv',5,60,5,t('s_conv'))+sl('admin',2,60,1,t('s_admin'))+'</div>'+
-'<div class="grid2" style="margin-top:12px"><div class="card"><div class="cap">'+t('t_lostRev')+'</div><div class="fig bad" data-n="lostRevM"></div><div class="cap"><span class="num" data-n="lostRevY"></span> '+t('t_lostY')+'</div></div>'+
-'<div class="card"><div class="cap">'+t('t_hours')+'</div><div class="fig" data-n="adminM"></div><div class="cap"><span class="num" data-n="adminY"></span> '+t('t_hoursY')+'</div></div></div>'+
-'<p class="cap" style="margin-top:8px"><span class="num" data-n="lostEnqM"></span> '+t('t_lostEnq')+'</p>'+
-'<details><summary>'+t('t_formula')+'</summary><p class="cap">'+t('t_f1')+'</p><p class="cap">'+t('t_f2')+'</p><p class="cap">'+t('t_f3')+'</p></details>'+
-'<h2>'+t('t_tools')+'</h2><p class="lead">'+t('t_toolsLead')+'</p><div class="grid2 tools">'+
-tl.map(function(x,i){return '<div class="tool"><b>'+x[0]+'</b><span>'+(i<3?'<span class="num" style="color:inherit" data-n="'+keys[i]+'"></span> ':'')+x[1]+'</span></div>'}).join('')+
-'</div><div style="margin-top:18px"><button class="btn" data-a="nav" data-v="portal">'+t('t_cta')+'</button></div>';
+function rHome(){
+var n=needs(),p=pend(),io=invOpen(),ex=excOpen();
+$('h-head').innerHTML='<h1>'+t('h_hi')+'</h1><p class="lead">'+t('h_sum1')+' <span class="num">164</span> '+t('h_sum2')+' '+(n?'<b style="color:var(--terracotta)">'+n+'</b> '+t('h_sum3'):t('h_sumClear'))+'</p><p class="cap">'+t('h_note')+'</p>'+
+'<div class="kpis"><button class="kpi'+(n?' hot':'')+'" data-a="nav" data-v="home"><div class="fig">'+n+'</div><div class="cap">'+t('k_need')+'</div></button><button class="kpi" data-a="nav" data-v="inbox"><div class="fig">'+p+'</div><div class="cap">'+t('k_ready')+'</div></button><button class="kpi" data-a="nav" data-v="numbers"><div class="fig" data-n="hrsW"></div><div class="cap">'+t('k_hours')+'</div></button><button class="kpi" data-a="nav" data-v="finance"><div class="fig">'+eur(invSum())+'</div><div class="cap">'+t('k_money')+'</div></button></div>';
+var L2=[];
+function nd(icn,txt,btns){L2.push('<div class="item need"><div class="dot">'+ic(icn,18)+'</div><div><div>'+txt+'</div><div class="row" style="margin-top:8px">'+btns+'</div></div></div>')}
+if(msgs[0].st==='p')nd('gmail',t('n_retreat'),'<button class="btn sm" data-a="mok" data-i="1">'+ic('check',16)+t('approve')+'</button><button class="btn quiet sm" data-a="nav" data-v="inbox">'+t('review')+'</button>');
+var rest=p-(msgs[0].st==='p'?1:0);
+if(rest)nd('inbox','<span class="num">'+rest+'</span> '+t('n_replies'),'<button class="btn ghost sm" data-a="nav" data-v="inbox">'+t('review')+'</button>');
+if(!S.clash)nd('diary',t('n_clash'),'<button class="btn sm" data-a="fix">'+t('swap')+'</button><button class="btn quiet sm" data-a="nav" data-v="diary">'+t('review')+'</button>');
+if(!leads[0].done)nd('sales',t('n_call'),'<button class="btn ghost sm" data-a="lead" data-i="0">'+t('done')+'</button>');
+if(io.length)nd('finance','<span class="num">'+io.length+'</span> '+t('n_inv')+' · <span class="num">'+eur(invSum())+'</span>','<button class="btn ghost sm" data-a="nav" data-v="finance">'+t('review')+'</button>');
+if(ex)nd('operations','<span class="num">'+ex+'</span> '+t('n_exc'),'<button class="btn ghost sm" data-a="nav" data-v="operations">'+t('review')+'</button>');
+$('h-needs').innerHTML='<h2>'+ic('bell')+t('n_h')+'</h2>'+(L2.length?L2.join(''):'<span class="tag ok">'+ic('check',14)+t('n_clear')+'</span>');
+var q=t('pa_q'),a='';
+if(S.pa==='urgent'){var u=[];if(msgs[0].st==='p')u.push(t('n_retreat'));if(!S.clash)u.push(t('n_clash'));if(!leads[0].done)u.push(t('n_call'));a=u.length?t('pa_urgentA')+' '+u.map(function(x){return x.replace(/\.$/,'')}).join('. ')+'.':t('pa_urgent0')}
+if(S.pa==='missed')a=t('pa_missed');
+if(S.pa==='call')a=leads[0].done?t('pa_callDone'):t('pa_call');
+if(S.pa==='money')a=io.length?eur(invSum())+' '+t('pa_money'):t('pa_moneyDone');
+$('h-pa').innerHTML='<h2>'+ic('spark')+t('pa_h')+'</h2><div class="chips">'+Object.keys(q).map(function(k){return '<button class="chip" data-a="pa" data-v="'+k+'" aria-pressed="'+(S.pa===k)+'">'+q[k]+'</button>'}).join('')+'</div><p class="ans">'+a+'</p>';
+$('h-feed').innerHTML='<div class="row sb" style="margin-bottom:10px"><h2 style="margin:0">'+ic('check')+t('f_h')+'</h2><span class="tag ol">'+t('f_sample')+'</span></div><div class="feed">'+t('feed').map(function(f){return '<time>'+f[0]+'</time><span>'+f[1]+'</span>'}).join('')+'</div>';
+rStage();upd();
 }
-
-function pend(){return msgs.filter(function(m){return m.st==='p'}).length}
-function invOpen(){return invs.filter(function(i){return !i.done}).length}
-function rPortal(){
-var tb=t('tabs'),h='<h1>'+t('p_h')+'</h1><p class="lead">'+t('p_lead')+'</p><div class="chips" role="toolbar">';
-Object.keys(tb).forEach(function(k){h+='<button class="chip" data-a="tab" data-v="'+k+'" aria-pressed="'+(S.tab===k)+'">'+tb[k]+'</button>'});
-h+='</div>';
-var p=pend(),io=invOpen();
-if(S.tab==='brief'){
-h+='<div class="grid2"><div class="card"><div class="fig">'+msgs.length+'</div><div class="cap">'+t('b_drafted')+'</div></div><div class="card"><div class="fig">'+p+'</div><div class="cap">'+t('b_wait')+'</div></div><div class="card"><div class="fig">'+(S.clash?0:1)+'</div><div class="cap">'+t('b_clash')+'</div></div><div class="card"><div class="fig">'+io+'</div><div class="cap">'+t('b_inv')+'</div></div></div>';
-if(msgs[0].st==='p')h+='<div class="card alertc" style="margin-top:12px"><span class="tag warn">'+t('b_alert')+'</span><p style="margin:8px 0">'+t('b_alertTxt')+'</p><button class="btn sm" data-a="tab" data-v="inbox">'+t('b_alertBtn')+'</button></div>';
-var acts=[];if(p)acts.push(['b_a1','inbox',p]);if(!S.clash)acts.push(['b_a2','cal']);if(!leads[0].done)acts.push(['b_a3','sales']);if(io)acts.push(['b_a4','fin',io]);
-h+='<h2>'+t('b_actions')+'</h2><div class="card">'+(acts.length?acts.map(function(a){return '<div class="item row" style="justify-content:space-between"><span>'+t(a[0])+(a[2]?' <span class="num">('+a[2]+')</span>':'')+'</span><button class="btn quiet sm" data-a="tab" data-v="'+a[1]+'">'+t('go')+'</button></div>'}).join(''):'<span class="tag ok">'+t('b_done')+'</span>')+'</div>';
+function rStage(){
+$('h-stagehead').innerHTML='<h2>'+t('st_h')+'</h2><div class="seg"><button data-a="conn" data-v="0" aria-pressed="'+(!S.connected)+'">'+t('st_before')+'</button><button data-a="conn" data-v="1" aria-pressed="'+S.connected+'">'+t('st_after')+'</button></div><p class="cap">'+(G.ok===false?t('st_nogl'):t('st_hint'))+'</p>';
+var m=t('mods'),nd=NODES.filter(function(n){return n.id===S.node})[0],h='';
+if(nd){var c=sysCount(nd.id);
+h+='<div class="row sb"><h3 style="font-size:17px;display:flex;gap:8px;align-items:center">'+ic(nd.id,20)+L(nd.n)+'</h3>'+(!S.connected?'<span class="tag warn">'+t('st_off')+'</span>':c?'<span class="tag hot">'+c+' '+t('st_need')+'</span>':'<span class="tag ok">'+t('st_ok')+'</span>')+'</div>'+
+'<p class="lbl" style="margin:10px 0 2px">'+t(S.connected?'st_shares':'st_pain')+'</p><p>'+L(S.connected?nd.s:nd.p)+'</p><div class="row"><span class="lbl">'+t('st_used')+'</span>'+Object.keys(MODS).filter(function(k){return MODS[k].indexOf(nd.id)>=0}).map(function(k){return '<span class="tag">'+m[k]+'</span>'}).join('')+'</div>'+
+(S.connected?'<div style="margin-top:12px"><button class="btn sm" data-a="nav" data-v="'+nd.v+'">'+t('open')+' '+t('nav')[nd.v]+ic('arrow',16)+'</button></div>':'');
+}else h+='<p class="cap" style="color:var(--on-carob-muted);margin:0">'+t('st_pick')+'</p>';
+h+='<p class="lbl" style="margin:14px 0 6px">'+t('st_mods')+'</p><div class="chips">'+Object.keys(m).map(function(k){return '<button class="chip" data-a="mod" data-v="'+k+'" aria-pressed="'+(S.mod===k)+'">'+m[k]+'</button>'}).join('')+'</div>';
+if(G.ok===false)h+='<div class="chips" style="margin-top:12px">'+NODES.map(function(n){var c=sysCount(n.id);return '<button class="chip" data-a="node" data-v="'+n.id+'" aria-pressed="'+(S.node===n.id)+'">'+L(n.n)+(c&&S.connected?'<span class="n">'+c+'</span>':'')+'</button>'}).join('')+'</div>';
+$('h-sys').innerHTML=h;
+if(G.ok)G.sync();
 }
-if(S.tab==='inbox'){
-h+='<p class="lead">'+t('i_lead')+'</p><div class="card">';
-msgs.forEach(function(m){
-h+='<div class="item"><div class="row" style="justify-content:space-between"><h3>'+m.who+'</h3><span class="tag ol">'+m.ch+'</span></div><div class="quote">'+L(m.q)+'</div>';
+function rInbox(){
+var f=[['all',t('i_all')],['gmail','Email'],['wa','WhatsApp'],['ig','Instagram']];
+var h='<h1>'+t('i_h')+'</h1><p class="lead">'+t('i_lead')+'</p><div class="chips" style="margin:12px 0">'+f.map(function(x){var c=pend(x[0]==='all'?null:x[0]);return '<button class="chip" data-a="filt" data-v="'+x[0]+'" aria-pressed="'+(S.filt===x[0])+'">'+x[1]+(c?'<span class="n">'+c+'</span>':'')+'</button>'}).join('')+'</div><div class="two">';
+var list=msgs.filter(function(m){return S.filt==='all'||m.k===S.filt});
+if(!list.length)h+='<p class="cap">'+t('i_none')+'</p>';
+list.forEach(function(m){
+h+='<div class="card"><div class="row sb"><h3>'+m.who+'</h3><span class="tag ol">'+ic(m.k,13)+m.ch+'</span></div><div class="quote">'+L(m.q)+'</div>';
 var d=m.cu!=null?esc(m.cu):L(m.d);
 if(m.st==='p'){
 if(m.ed)h+='<label class="lbl" for="ta-'+m.id+'">'+t('i_draft')+'</label><textarea id="ta-'+m.id+'">'+d+'</textarea><div class="row" style="margin-top:8px"><button class="btn sm" data-a="msave" data-i="'+m.id+'">'+t('save')+'</button></div>';
-else h+='<div class="lbl">'+t('i_draft')+'</div><div class="draft">'+d+'</div><div class="row"><button class="btn sm" data-a="mok" data-i="'+m.id+'">'+t('approve')+'</button><button class="btn ghost sm" data-a="medit" data-i="'+m.id+'">'+t('edit')+'</button><button class="btn quiet sm" data-a="mno" data-i="'+m.id+'">'+t('reject')+'</button></div>';
+else h+='<div class="lbl">'+t('i_draft')+'</div><div class="draft">'+d+'</div><div class="row"><button class="btn sm" data-a="mok" data-i="'+m.id+'">'+ic('check',16)+t('approve')+'</button><button class="btn ghost sm" data-a="medit" data-i="'+m.id+'">'+t('edit')+'</button><button class="btn quiet sm" data-a="mno" data-i="'+m.id+'">'+t('reject')+'</button></div>';
 }else h+='<div class="row"><span class="tag '+(m.st==='a'?'ok':'warn')+'">'+t(m.st==='a'?'i_ok':'i_no')+'</span><button class="btn quiet sm" data-a="mundo" data-i="'+m.id+'">'+t('undo')+'</button></div>';
 h+='</div>'});
-h+='</div>';
+$('v-inbox').innerHTML=h+'</div>';
 }
-if(S.tab==='cal'){
-h+='<p class="lead">'+t('c_lead')+'</p>';
-h+=S.clash?'<div class="card" style="border-color:var(--ok);background:var(--ok-bg);margin-bottom:12px">'+t('c_fixed')+'</div>':'<div class="card alertc" style="margin-bottom:12px"><span class="tag warn">'+t('c_clash')+'</span><p style="margin:8px 0">'+t('c_clashTxt')+'</p><button class="btn sm" data-a="fix">'+t('c_fix')+'</button></div>';
-h+='<div class="card"><div class="lbl">'+t('c_day')+'</div>';
-evs.forEach(function(e){var tx=L(e.t);if(S.clash&&e.c){if(e.s==='book')tx=tx.replace('Lucía','Marta');}
+function rDiary(){
+var h='<h1>'+t('c_h')+'</h1><p class="lead">'+t('c_lead')+'</p><div class="two" style="margin-top:12px"><div>';
+h+=S.clash?'<div class="card" style="border-color:var(--ok);background:var(--ok-bg)">'+t('c_fixed')+'</div>':'<div class="card alertc"><span class="tag warn">'+t('c_clash')+'</span><p style="margin:8px 0">'+t('c_clashTxt')+'</p><button class="btn sm" data-a="fix">'+t('swap')+'</button></div>';
+h+='</div><div class="card"><div class="lbl">'+t('c_day')+'</div>';
+evs.forEach(function(e){var tx=L(e.t);if(S.clash&&e.c&&e.s==='book')tx=tx.replace('Lucía','Marta');
 h+='<div class="ev'+(e.c&&!S.clash?' clash':'')+'"><time>'+e.h+'</time><div>'+tx+'<br><span class="tag'+(e.s==='own'?' ol':'')+'">'+t('c_src')[e.s]+'</span></div></div>'});
-h+='</div>';
+$('v-diary').innerHTML=h+'</div></div>';
 }
-if(S.tab==='sales'){
-h+='<p class="lead">'+t('sa_lead')+'</p><div class="card">';
-leads.forEach(function(l,i){h+='<div class="item"><div class="row" style="justify-content:space-between"><h3>'+l.who+'</h3><span class="tag'+(l.sc>=60?'':' ol')+'">'+t(l.sc>=60?'sa_gen':'sa_look')+' · '+l.sc+'</span></div><div class="cap">'+L(l.w)+'</div><div class="bar" style="margin:8px 0"><i style="width:'+l.sc+'%"></i></div><div class="row" style="justify-content:space-between"><span style="flex:1;min-width:160px;font-size:14px"><b>'+t('sa_next')+':</b> '+L(l.n)+'</span>'+(l.sc>=60?'<button class="btn '+(l.done?'quiet':'ghost')+' sm" data-a="lead" data-i="'+i+'">'+t(l.done?'sa_done':'sa_do')+'</button>':'')+'</div></div>'});
-h+='</div>';
+function rSales(){
+var h='<h1>'+t('sa_h')+'</h1><p class="lead">'+t('sa_lead')+'</p><div class="two" style="margin-top:12px">';
+leads.forEach(function(l,i){h+='<div class="card"><div class="row sb"><h3>'+l.who+'</h3><span class="tag'+(l.sc>=60?'':' ol')+'">'+t(l.sc>=60?'sa_gen':'sa_look')+' · '+l.sc+'</span></div><div class="cap">'+L(l.w)+'</div><div class="bar" style="margin:8px 0"><i style="width:'+l.sc+'%"></i></div><div class="row sb"><span style="flex:1;min-width:160px;font-size:14px"><b>'+t('sa_next')+':</b> '+L(l.n)+'</span>'+(l.sc>=60?'<button class="btn '+(l.done?'quiet':'ghost')+' sm" data-a="lead" data-i="'+i+'">'+t(l.done?'sa_done':'done')+'</button>':'')+'</div></div>'});
+$('v-sales').innerHTML=h+'</div>';
 }
-if(S.tab==='ops'){
-h+='<h2 style="margin-top:6px">'+t('o_auto')+'</h2><div class="card">';
-autos.forEach(function(a,i){h+='<div class="item row" style="justify-content:space-between;flex-wrap:nowrap"><div><div>'+L(a.n)+'</div><div class="cap"><span class="num">'+a.r+'</span> '+t('o_runs')+'</div></div><button class="sw" role="switch" aria-checked="'+a.on+'" aria-label="'+esc(L(a.n))+'" data-a="auto" data-i="'+i+'"></button></div>'});
-h+='</div><h2>'+t('o_exc')+'</h2><div class="card">';
-excs.forEach(function(e,i){h+='<div class="item row" style="justify-content:space-between"><span style="flex:1;min-width:180px">'+L(e.t)+'</span>'+(e.done?'<span class="tag ok">'+t('o_resd')+'</span>':'<button class="btn ghost sm" data-a="exc" data-i="'+i+'">'+t('o_res')+'</button>')+'</div>'});
-h+='</div>';
+function rOps(){
+var h='<h1>'+t('o_h')+'</h1><div class="two" style="margin-top:12px"><div class="card"><h2>'+t('o_auto')+'</h2>';
+autos.forEach(function(a,i){h+='<div class="item row sb" style="flex-wrap:nowrap"><div><div>'+L(a.n)+'</div><div class="cap"><span class="num">'+a.r+'</span> '+t('o_runs')+'</div></div><button class="sw" role="switch" aria-checked="'+a.on+'" aria-label="'+esc(L(a.n))+'" data-a="auto" data-i="'+i+'"></button></div>'});
+h+='</div><div class="card"><h2>'+t('o_exc')+'</h2>';
+excs.forEach(function(e,i){h+='<div class="item row sb"><span style="flex:1;min-width:180px">'+L(e.t)+'</span>'+(e.done?'<span class="tag ok">'+t('o_resd')+'</span>':'<button class="btn ghost sm" data-a="exc" data-i="'+i+'">'+t('o_res')+'</button>')+'</div>'});
+$('v-operations').innerHTML=h+'</div></div>';
 }
-if(S.tab==='fin'){
+function rFin(){
 var tot=0,got=0;invs.forEach(function(v){var d=v.a-v.c;tot+=d;if(v.done)got+=d});
-h+='<p class="lead">'+t('f_lead')+'</p><div class="card" style="margin-bottom:12px"><div class="cap">'+t('f_total')+'</div><div class="fig">'+eur(got)+'</div><div class="cap">'+t('f_of')+' <span class="num">'+eur(tot)+'</span> '+t('f_found')+'</div><div class="bar" style="margin-top:8px"><i style="width:'+Math.round(got/tot*100)+'%"></i></div></div><div class="card"><div class="lbl">'+t('f_flag')+'</div>';
-invs.forEach(function(v,i){h+='<div class="item"><h3>'+v.who+'</h3><div class="cap">'+L(v.t)+'</div><div class="row cap" style="margin:6px 0">'+(v.c?'<span>'+t('f_inv')+' <span class="num">'+eur(v.a)+'</span></span><span>'+t('f_con')+' <span class="num">'+eur(v.c)+'</span></span>':'')+'<span class="tag warn">'+t('f_diff')+' '+eur(v.a-v.c)+'</span></div>'+(v.done?'<span class="tag ok">'+t('f_qd')+'</span>':'<button class="btn ghost sm" data-a="inv" data-i="'+i+'">'+t('f_q')+'</button>')+'</div>'});
-h+='</div>';
+var h='<h1>'+t('fi_h')+'</h1><p class="lead">'+t('fi_lead')+'</p><div class="two" style="margin-top:12px"><div class="card"><div class="cap">'+t('fi_total')+'</div><div class="fig">'+eur(got)+'</div><div class="cap">'+t('fi_of')+' <span class="num">'+eur(tot)+'</span> '+t('fi_found')+'</div><div class="bar" style="margin-top:8px"><i style="width:'+Math.round(got/tot*100)+'%"></i></div></div><div class="card"><div class="lbl" style="margin-bottom:8px">'+t('fi_flag')+'</div>';
+invs.forEach(function(v,i){h+='<div class="item"><h3>'+L(v.who)+'</h3><div class="cap">'+L(v.t)+'</div><div class="row cap" style="margin:6px 0">'+(v.c?'<span>'+t('fi_inv')+' <span class="num">'+eur(v.a)+'</span></span><span>'+t('fi_con')+' <span class="num">'+eur(v.c)+'</span></span>':'')+'<span class="tag warn">'+t('fi_diff')+' '+eur(v.a-v.c)+'</span></div>'+(v.done?'<span class="tag ok">'+t('fi_qd')+'</span>':'<button class="btn ghost sm" data-a="inv" data-i="'+i+'">'+t('fi_q')+'</button>')+'</div>'});
+$('v-finance').innerHTML=h+'</div></div>';
 }
-if(S.tab==='time'){
-h+='<p class="lead">'+t('ti_lead')+'</p><div class="grid2"><div class="card"><div class="cap">'+t('ti_w')+'</div><div class="fig"><span data-n="hrsW"></span> <span style="font-size:15px">'+t('hrs')+'</span></div></div><div class="card"><div class="cap">'+t('ti_m')+'</div><div class="fig"><span data-n="hrsM"></span> <span style="font-size:15px">'+t('hrs')+'</span></div></div></div><div class="card" style="margin-top:10px"><div class="cap">'+t('ti_y')+'</div><div class="fig"><span data-n="hrsY"></span> <span style="font-size:15px">'+t('hrs')+'</span></div><div class="bar" style="margin-top:8px"><i data-w="_adm"></i></div><p class="cap" style="margin:8px 0 0">'+t('ti_note')+'</p></div>';
+function rNum(){
+function ba(title,b,bc,a,ac,w){return '<div><div class="lbl" style="margin-bottom:6px">'+title+'</div><div class="ba"><div><div class="cap">'+t('out_b')+'</div><div class="fig bad" data-n="'+b+'"></div><div class="cap">'+bc+'</div></div><div class="after"><div class="cap">'+t('out_a')+'</div>'+a+'<div class="cap">'+ac+'</div></div></div>'+(w?'<div class="bar" style="margin-top:8px"><i data-w="'+w+'"></i></div>':'')+'</div>'}
+$('v-numbers').innerHTML='<h1>'+t('nu_h')+'</h1><p class="lead">'+t('nu_lead')+'</p><div class="two" style="margin-top:12px"><div class="stack"><div class="card stack"><h2 style="margin:0">'+t('nu_in')+'</h2>'+sl('enq',5,300,5,t('s_enq'))+sl('miss',0,80,5,t('s_miss'))+sl('val',20,600,5,t('s_val'))+sl('conv',5,60,5,t('s_conv'))+sl('admin',2,60,1,t('s_admin'))+'</div><div class="card stack"><h2 style="margin:0">'+t('nu_as')+'</h2>'+sl('rec',10,100,5,t('a_rec'))+sl('adm',10,80,5,t('a_adm'))+'</div></div>'+
+'<div class="stack"><div class="card stack">'+ba(t('out_rev'),'lostRevY',t('out_revB'),'<div class="fig" data-n="recRevY"></div>',t('out_revA'),'_rec')+ba(t('out_hrs'),'adminY',t('out_hrsB'),'<div class="fig" data-n="hrsY"></div>',t('out_hrsA'),'_adm')+ba(t('out_rt'),'miss',t('out_rtB'),'<p style="margin:4px 0;font-weight:600;color:var(--azulejo)">'+t('out_rtA')+'</p>','',null)+
+'<details><summary>'+t('t_formula')+'</summary><p class="cap">'+t('t_f1')+'</p><p class="cap">'+t('t_f2')+'</p><p class="cap">'+t('t_f3')+'</p></details><p class="cap" style="margin:0">'+t('out_note')+'</p></div>'+
+'<div class="card" style="border-radius:120px 120px 16px 16px;padding:40px 20px 22px;text-align:center;border-color:var(--terracotta)"><div style="font-family:var(--display);font-weight:700;font-size:26px;color:var(--terracotta);margin-bottom:6px">'+t('out_cta')+'</div><p>'+t('out_ctaTxt')+'</p><a class="btn" href="https://www.vyrehq.com/adelante/">'+t('out_btn')+'</a><p class="cap" style="margin:12px 0 0">'+t('out_mail')+'</p></div></div></div>';
 }
-document.getElementById('v-portal').innerHTML=h;upd();
-}
-
-var MODS={reply:['gmail','wa','ig'],follow:['crm','wa','gmail','cal'],content:['ig','drive'],back:['book','pay','acc','drive','cal']};
-var NODES=[
-{id:'gmail',n:{en:'Email',es:'Correo'},s:{en:'Enquiries, supplier invoices, client threads.',es:'Consultas, facturas de proveedores, conversaciones con clientes.'},p:{en:'Enquiries buried under everything else, answered a day late.',es:'Consultas enterradas entre todo lo demás, respondidas un día tarde.'}},
-{id:'wa',n:{en:'WhatsApp',es:'WhatsApp'},s:{en:'Client messages, booking changes, quick questions.',es:'Mensajes de clientes, cambios de reserva, dudas rápidas.'},p:{en:'Messages sitting on one person’s phone, unseen when they are off.',es:'Mensajes en el móvil de una sola persona, sin ver cuando libra.'}},
-{id:'ig',n:{en:'Instagram',es:'Instagram'},s:{en:'Direct messages and comments that are really enquiries.',es:'Mensajes directos y comentarios que en realidad son consultas.'},p:{en:'Enquiries lost in a feed nobody checks during classes.',es:'Consultas perdidas en una red que nadie mira durante las clases.'}},
-{id:'cal',n:{en:'Calendars',es:'Calendarios'},s:{en:'Staff availability, owner’s diary, room use.',es:'Disponibilidad del equipo, agenda de la dirección, uso de salas.'},p:{en:'Double bookings found on the morning, not the week before.',es:'Solapamientos que se descubren esa mañana, no la semana anterior.'}},
-{id:'book',n:{en:'Booking system',es:'Reservas'},s:{en:'Classes, spaces left, waiting lists, no-shows.',es:'Clases, plazas libres, listas de espera, ausencias.'},p:{en:'Cancelled spaces staying empty while a waiting list exists.',es:'Plazas canceladas que se quedan vacías habiendo lista de espera.'}},
-{id:'crm',n:{en:'Client records',es:'Clientes'},s:{en:'Who each person is, what they asked, what they bought.',es:'Quién es cada persona, qué preguntó, qué compró.'},p:{en:'Typing the same client into three places, and still missing history.',es:'Escribir al mismo cliente en tres sitios y aun así perder el historial.'}},
-{id:'pay',n:{en:'Payments',es:'Pagos'},s:{en:'Card takings, fees charged, refunds.',es:'Cobros con tarjeta, comisiones, devoluciones.'},p:{en:'Card fees drifting above the agreed rate with nobody checking.',es:'Comisiones de tarjeta por encima de lo acordado sin que nadie lo revise.'}},
-{id:'acc',n:{en:'Accounting',es:'Contabilidad'},s:{en:'Invoices in and out, what is owed, what is due.',es:'Facturas emitidas y recibidas, lo que te deben, lo que debes.'},p:{en:'A shoebox of invoices sent to the accountant at quarter end.',es:'Una caja de facturas enviada a la gestoría al cierre del trimestre.'}},
-{id:'drive',n:{en:'Shared files',es:'Archivos'},s:{en:'Price lists, policies, photos, templates.',es:'Tarifas, políticas, fotos, plantillas.'},p:{en:'Old price lists sent out because nobody could find the new one.',es:'Tarifas antiguas enviadas porque nadie encontraba la nueva.'}}];
-function nodeMods(id){return Object.keys(MODS).filter(function(m){return MODS[m].indexOf(id)>=0})}
-
-function rConn(){
-document.getElementById('c-top').innerHTML='<h1>'+t('k_h')+'</h1><p class="lead">'+t('k_lead')+'</p><div class="row" style="margin:12px 0"><div class="seg"><button data-a="conn" data-v="0" aria-pressed="'+(!S.connected)+'">'+t('k_before')+'</button><button data-a="conn" data-v="1" aria-pressed="'+S.connected+'">'+t('k_after')+'</button></div></div><p class="cap">'+(G.ok===false?t('k_nogl'):t('k_hint'))+'</p>';
-var m=t('mods'),h='<h2>'+t('k_mods')+'</h2><p class="cap">'+t('k_modHint')+'</p><div class="row">';
-Object.keys(m).forEach(function(k){h+='<button class="chip" data-a="mod" data-v="'+k+'" aria-pressed="'+(S.mod===k)+'">'+m[k]+'</button>'});
-h+='</div><div class="card" style="margin-top:14px">';
-var nd=NODES.filter(function(n){return n.id===S.node})[0];
-if(nd){h+='<div class="row" style="justify-content:space-between"><h3 style="font-size:17px">'+L(nd.n)+'</h3><span class="tag '+(S.connected?'ok':'warn')+'">'+t(S.connected?'k_after':'k_before')+'</span></div><p class="lbl" style="margin-top:10px">'+t('k_pain')+'</p><p>'+L(nd.p)+'</p><p class="lbl">'+t('k_shares')+'</p><p>'+L(nd.s)+'</p><p class="lbl">'+t('k_used')+'</p><div class="row">'+nodeMods(nd.id).map(function(k){return '<span class="tag">'+m[k]+'</span>'}).join('')+'</div>';}
-else h+='<p class="cap" style="margin:0">'+t('k_pick')+'</p>';
-h+='</div><div class="row" style="margin-top:12px">'+NODES.map(function(n){return '<button class="chip" data-a="node" data-v="'+n.id+'" aria-pressed="'+(S.node===n.id)+'">'+L(n.n)+'</button>'}).join('')+'</div>';
-document.getElementById('c-bottom').innerHTML=h;
-if(G.ok)G.sync();
-}
-
-function rOut(){
-document.getElementById('v-outcome').innerHTML=
-'<h1>'+t('out_h')+'</h1><p class="lead">'+t('out_lead')+'</p>'+
-'<div class="card stack" style="margin-top:14px">'+sl('rec',10,100,5,t('a_rec'))+sl('adm',10,80,5,t('a_adm'))+'</div>'+
-'<h2>'+t('out_rev')+'</h2><div class="ba"><div><div class="lbl">'+t('out_b')+'</div><div class="fig bad" data-n="lostRevY"></div><div class="cap">'+t('out_revB')+'</div></div><div class="after"><div class="lbl">'+t('out_a')+'</div><div class="fig" data-n="recRevY"></div><div class="cap">'+t('out_revA')+'</div></div></div><div class="bar" style="margin-top:8px"><i data-w="_rec"></i></div>'+
-'<h2>'+t('out_hrs')+'</h2><div class="ba"><div><div class="lbl">'+t('out_b')+'</div><div class="fig bad" data-n="adminY"></div><div class="cap">'+t('out_hrsB')+'</div></div><div class="after"><div class="lbl">'+t('out_a')+'</div><div class="fig" data-n="hrsY"></div><div class="cap">'+t('out_hrsA')+'</div></div></div><div class="bar" style="margin-top:8px"><i data-w="_adm"></i></div>'+
-'<h2>'+t('out_rt')+'</h2><div class="ba"><div><div class="lbl">'+t('out_b')+'</div><div class="fig bad" data-n="miss"></div><div class="cap">'+t('out_rtB')+'</div></div><div class="after"><div class="lbl">'+t('out_a')+'</div><p style="margin:6px 0 0;font-weight:600;color:var(--azulejo)">'+t('out_rtA')+'</p></div></div>'+
-'<p class="cap" style="margin-top:14px">'+t('out_note')+'</p>'+
-'<div class="card" style="margin-top:18px;border-radius:120px 120px 16px 16px;padding:38px 20px 22px;text-align:center;border-color:var(--terracotta)"><h2 style="margin:0 0 6px;color:var(--terracotta);font-size:26px">'+t('out_cta')+'</h2><p>'+t('out_ctaTxt')+'</p><a class="btn" style="display:inline-flex;align-items:center;text-decoration:none" href="https://www.vyrehq.com/adelante/">'+t('out_btn')+'</a><p class="cap" style="margin:12px 0 0">'+t('out_mail')+'</p></div>';
-}
-
 function chrome(){
 document.documentElement.lang=S.lang;
-document.getElementById('demoPill').textContent=t('demo');
-document.getElementById('langBtn').textContent=t('langBtn');
+document.querySelectorAll('[data-t]').forEach(function(e){e.textContent=t(e.getAttribute('data-t'))});
 var n=t('nav');
-document.getElementById('navIn').innerHTML=VIEWS.map(function(v,i){return '<button data-a="nav" data-v="'+v+'"'+(S.view===v?' aria-current="page"':'')+'><b>'+(i+1)+'</b>'+n[i]+'</button>'}).join('');
-VIEWS.forEach(function(v){document.getElementById('v-'+v).hidden=S.view!==v});
-var tr=document.getElementById('tour');
-tr.innerHTML=S.tour?'<div><p>'+t('tour')[S.tour-1]+'</p><button data-a="tskip">'+t('skip')+'</button><button class="go" data-a="tnext">'+t(S.tour<4?'next':'finish')+'</button></div>':'';
+function b(v,side){var c=navCount(v);return '<button data-a="nav" data-v="'+v+'"'+(S.view===v?' aria-current="page"':'')+'>'+ic(v,side?18:20)+'<span class="t">'+n[v]+'</span>'+(c?'<span class="n">'+c+'</span>':'')+'</button>'}
+$('snav').innerHTML=VIEWS.map(function(v){return b(v,1)}).join('');
+var moreOn=['operations','finance','numbers'].indexOf(S.view)>=0;
+$('bnav').innerHTML=['home','inbox','diary','sales'].map(function(v){return b(v)}).join('')+'<button data-a="more"'+(moreOn?' aria-current="page"':'')+' aria-expanded="'+S.sheet+'">'+ic('more',20)+'<span class="t">'+t('more')+'</span>'+((excOpen()+invOpen().length)?'<span class="n">'+(excOpen()+invOpen().length)+'</span>':'')+'</button>';
+$('sheet').hidden=!S.sheet;
+$('sheet').innerHTML=['operations','finance','numbers'].map(function(v){return b(v,1)}).join('');
+VIEWS.forEach(function(v){$('v-'+v).hidden=S.view!==v});
 }
-function all(){rToday();rPortal();rConn();rOut();chrome();upd();}
-function go(v,noHash){if(VIEWS.indexOf(v)<0)v='today';S.view=v;chrome();if(v==='connections')G.init();if(!noHash){try{if(location.hash!=='#'+v)location.hash=v}catch(e){}}window.scrollTo(0,0);}
+function all(){rHome();rInbox();rDiary();rSales();rOps();rFin();rNum();chrome();upd();}
+function go(v,noHash){if(VIEWS.indexOf(v)<0)v='home';S.view=v;S.sheet=false;chrome();if(v==='home')G.init();if(!noHash){try{if(location.hash!=='#'+v)location.hash=v}catch(e){}}window.scrollTo(0,0);}
 
 document.addEventListener('click',function(e){
 var b=e.target.closest('[data-a]');if(!b)return;
 var a=b.getAttribute('data-a'),v=b.getAttribute('data-v'),i=+b.getAttribute('data-i');
 function m(){return msgs.filter(function(x){return x.id===i})[0]}
 if(a==='nav'){go(v);return}
-if(a==='lang'){S.lang=S.lang==='en'?'es':'en';all();return}
-if(a==='tab'){S.tab=v;if(S.view!=='portal')go('portal');rPortal();return}
+if(a==='more'){S.sheet=!S.sheet;chrome();return}
+if(a==='lang'){S.lang=S.lang==='en'?'es':'en'}
+if(a==='filt'){S.filt=v}
+if(a==='pa'){S.pa=v}
 if(a==='mok'){m().st='a';m().ed=false}
 if(a==='mno'){m().st='r';m().ed=false}
 if(a==='mundo'){m().st='p'}
 if(a==='medit'){m().ed=true}
-if(a==='msave'){var ta=document.getElementById('ta-'+i);m().cu=ta.value;m().ed=false}
+if(a==='msave'){m().cu=$('ta-'+i).value;m().ed=false}
 if(a==='fix'){S.clash=true}
 if(a==='lead'){leads[i].done=!leads[i].done}
 if(a==='auto'){autos[i].on=!autos[i].on}
 if(a==='exc'){excs[i].done=true}
 if(a==='inv'){invs[i].done=true}
-if(a==='conn'){S.connected=v==='1';rConn();return}
-if(a==='mod'){S.mod=S.mod===v?null:v;rConn();return}
-if(a==='node'){S.node=S.node===v?null:v;rConn();return}
-if(a==='tskip'){S.tour=0;chrome();return}
-if(a==='tnext'){if(S.tour>=4){S.tour=0;chrome()}else{S.tour++;go(VIEWS[S.tour-1])}return}
-rPortal();
+if(a==='conn'){S.connected=v==='1'}
+if(a==='mod'){S.mod=S.mod===v?null:v}
+if(a==='node'){S.node=S.node===v?null:v}
+all();
 });
 document.addEventListener('input',function(e){
 var k=e.target.getAttribute&&e.target.getAttribute('data-s');if(!k)return;
-S[k]=+e.target.value;document.getElementById('o-'+k).textContent=S[k]+SUF[k];upd();
+S[k]=+e.target.value;$('o-'+k).textContent=S[k]+SUF[k];upd();
 });
 window.addEventListener('hashchange',function(){var v=location.hash.slice(1);if(v&&v!==S.view)go(v,true)});
 
 var G={ok:null,init:function(){
 if(G.ok!==null)return;
-var stage=document.getElementById('stage'),cv=document.getElementById('cv');
-try{if(!window.THREE)throw 0;G.r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:false});}catch(err){G.ok=false;stage.style.display='none';rConn();return}
+var stage=$('stage'),cv=$('cv');
+try{if(!window.THREE)throw 0;G.r=new THREE.WebGLRenderer({canvas:cv,antialias:true});}catch(err){G.ok=false;stage.style.display='none';rStage();return}
 G.ok=true;
-var r=G.r,sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(42,1,0.1,200);
-sc.background=new THREE.Color(0xFBF7F0);
+var r=G.r,sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,0.1,200);
+sc.background=new THREE.Color(0x2A1E17);sc.fog=new THREE.Fog(0x2A1E17,22,46);
 r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-sc.add(new THREE.AmbientLight(0xffffff,0.85));var dl=new THREE.DirectionalLight(0xffffff,0.55);dl.position.set(8,14,10);sc.add(dl);
-var floor=new THREE.Mesh(new THREE.CircleGeometry(11,64),new THREE.MeshBasicMaterial({color:0xF3ECDF}));floor.rotation.x=-Math.PI/2;floor.position.y=-0.01;sc.add(floor);
-var terra=new THREE.MeshPhongMaterial({color:0xB4532A,shininess:8});
-[-1.4,1.4].forEach(function(x){var p=new THREE.Mesh(new THREE.BoxGeometry(0.8,2.6,0.8),terra);p.position.set(x,1.3,0);sc.add(p)});
-var top=new THREE.Mesh(new THREE.TorusGeometry(1.4,0.4,14,32,Math.PI),terra);top.position.y=2.6;top.scale.z=1;sc.add(top);
-var tiles={},tk=['reply','follow','content','back'],tp=[[-0.4,1.75],[0.4,1.75],[-0.4,0.95],[0.4,0.95]];
-tk.forEach(function(k,i){var m=new THREE.Mesh(new THREE.BoxGeometry(0.66,0.66,0.22),new THREE.MeshPhongMaterial({color:0xE9E4F0}));m.position.set(tp[i][0],tp[i][1],0);sc.add(m);tiles[k]=m});
-var hub=new THREE.Vector3(0,1.4,0),items=[],pick=[];
+sc.add(new THREE.HemisphereLight(0xfff4e6,0x2A1E17,0.95));var dl=new THREE.DirectionalLight(0xffffff,0.7);dl.position.set(6,14,10);sc.add(dl);
+var grid=new THREE.GridHelper(40,40,0x4A3B30,0x3A2C23);sc.add(grid);
+var plinth=new THREE.Mesh(new THREE.CylinderGeometry(3,3.2,0.24,48),new THREE.MeshStandardMaterial({color:0x34271F,roughness:.9}));plinth.position.y=0.12;sc.add(plinth);
+var ring=new THREE.Mesh(new THREE.RingGeometry(7.6,7.7,96),new THREE.MeshBasicMaterial({color:0x4A3B30,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=0.02;sc.add(ring);
+var terra=new THREE.MeshStandardMaterial({color:0xE08A63,roughness:.65});
+var arch=new THREE.Group();arch.position.y=0.24;sc.add(arch);
+[-1.4,1.4].forEach(function(x){var p=new THREE.Mesh(new THREE.BoxGeometry(0.8,2.6,0.8),terra);p.position.set(x,1.3,0);arch.add(p)});
+var top=new THREE.Mesh(new THREE.TorusGeometry(1.4,0.4,16,40,Math.PI),terra);top.position.y=2.6;arch.add(top);
+var tiles={},tk=['reply','follow','content','back'],tp=[[-0.42,1.8],[0.42,1.8],[-0.42,0.96],[0.42,0.96]];
+tk.forEach(function(k,i){var m=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.24),new THREE.MeshStandardMaterial({color:0x4A3B30,roughness:.5}));m.position.set(tp[i][0],tp[i][1],0);arch.add(m);tiles[k]=m});
+var hub=new THREE.Vector3(0,1.7,0),items=[],pick=[];
+function paint(it,state){var c=it.ctx,s=128;c.clearRect(0,0,s,s);
+var fill=state==='off'?'#4A3B30':state==='hot'?'#B4532A':'#2E3A6B',edge=state==='off'?'#C0625A':state==='hot'?'#E08A63':'#A9B6E8';
+c.beginPath();var q=14,x=6,w=s-12;c.moveTo(x+q,x);c.arcTo(x+w,x,x+w,x+w,q);c.arcTo(x+w,x+w,x,x+w,q);c.arcTo(x,x+w,x,x,q);c.arcTo(x,x,x+w,x,q);c.closePath();
+c.fillStyle=fill;c.fill();c.lineWidth=4;c.strokeStyle=edge;if(state==='off')c.setLineDash([10,8]);else c.setLineDash([]);c.stroke();c.setLineDash([]);
+c.save();c.translate(28,28);c.scale(3,3);c.lineWidth=1.7;c.lineCap='round';c.lineJoin='round';c.strokeStyle=state==='off'?'#CBBFB2':'#FFFFFF';c.stroke(new Path2D(IC[it.n.id]));c.restore();
+it.tex.needsUpdate=true;}
 NODES.forEach(function(n,i){
-var a=i/NODES.length*Math.PI*2,pos=new THREE.Vector3(Math.cos(a)*7.2,1.2+Math.sin(i*1.9)*1.1+1,Math.sin(a)*7.2);
-var mat=new THREE.MeshPhongMaterial({color:0x9A8F86,transparent:true});
-var mesh=new THREE.Mesh(new THREE.SphereGeometry(0.6,28,18),mat);mesh.position.copy(pos);mesh.userData.id=n.id;sc.add(mesh);pick.push(mesh);
-var stem=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,pos.y,8),new THREE.MeshBasicMaterial({color:0xEADFD0}));stem.position.set(pos.x,pos.y/2,pos.z);sc.add(stem);
-var full=new THREE.Line(new THREE.BufferGeometry().setFromPoints([pos,hub]),new THREE.LineBasicMaterial({color:0x2E3A6B,transparent:true}));sc.add(full);
-var mid=pos.clone().lerp(hub,0.3),stub=new THREE.Line(new THREE.BufferGeometry().setFromPoints([pos,mid]),new THREE.LineBasicMaterial({color:0xA3261E,transparent:true,opacity:0.7}));sc.add(stub);
-var cap=new THREE.Mesh(new THREE.SphereGeometry(0.14,10,8),new THREE.MeshBasicMaterial({color:0xA3261E}));cap.position.copy(mid);sc.add(cap);
-var pulse=new THREE.Mesh(new THREE.SphereGeometry(0.16,12,10),new THREE.MeshBasicMaterial({color:0x2E3A6B}));sc.add(pulse);
+var a=i/NODES.length*Math.PI*2+0.3,pos=new THREE.Vector3(Math.cos(a)*7.6,2.1+Math.sin(i*2.1)*0.9,Math.sin(a)*7.6);
+var can=document.createElement('canvas');can.width=can.height=128;var tex=new THREE.CanvasTexture(can);
+var mat=new THREE.MeshBasicMaterial({map:tex,transparent:true});
+var mesh=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.5),mat);mesh.position.copy(pos);mesh.userData.id=n.id;sc.add(mesh);pick.push(mesh);
+var stem=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,pos.y-0.8,6),new THREE.MeshBasicMaterial({color:0x4A3B30}));stem.position.set(pos.x,(pos.y-0.8)/2,pos.z);sc.add(stem);
+var mid=pos.clone().lerp(hub,0.5);mid.y+=2.2;
+var curve=new THREE.QuadraticBezierCurve3(pos,mid,hub);
+var tube=new THREE.Mesh(new THREE.TubeGeometry(curve,28,0.035,6,false),new THREE.MeshBasicMaterial({color:0xA9B6E8,transparent:true,opacity:.75}));sc.add(tube);
+var cut=curve.getPoint(0.22),stub=new THREE.Line(new THREE.BufferGeometry().setFromPoints([pos,curve.getPoint(0.11),cut]),new THREE.LineBasicMaterial({color:0xC0625A}));sc.add(stub);
+var cap=new THREE.Mesh(new THREE.SphereGeometry(0.11,10,8),new THREE.MeshBasicMaterial({color:0xC0625A}));cap.position.copy(cut);sc.add(cap);
+var pulses=[0,0.5].map(function(o){var p=new THREE.Mesh(new THREE.SphereGeometry(0.11,10,8),new THREE.MeshBasicMaterial({color:0xFBF7F0}));p.userData.o=o;sc.add(p);return p});
 var lab=document.createElement('button');lab.className='nl';lab.setAttribute('data-a','node');lab.setAttribute('data-v',n.id);stage.appendChild(lab);
-items.push({n:n,pos:pos,mesh:mesh,mat:mat,full:full,stub:stub,cap:cap,pulse:pulse,lab:lab,off:i*0.37});
+items.push({n:n,pos:pos,mesh:mesh,mat:mat,tex:tex,ctx:can.getContext('2d'),curve:curve,tube:tube,stub:stub,cap:cap,pulses:pulses,lab:lab,off:i*0.37});
 });
-var ang=0.7,el=0.42,R=19,W=0,H=0,ptr={},drag=false,moved=0,lastD=0,idle=999;
+var ang=0.6,el=0.5,R=18.5,W=0,H=0,ptr={},drag=false,moved=0,lastD=0,idle=999;
 var still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 G.sync=function(){
 var act=S.mod?MODS[S.mod]:null;
 items.forEach(function(it){
-var dim=act&&act.indexOf(it.n.id)<0,sel=S.node===it.n.id;
-it.mat.color.set(S.connected?0x2E3A6B:0x9A8F86);it.mat.opacity=dim?0.25:1;
-it.mesh.scale.setScalar(sel?1.35:1);
-it.full.visible=S.connected;it.full.material.opacity=dim?0.12:0.8;
-it.stub.visible=it.cap.visible=!S.connected;it.pulse.visible=S.connected&&!dim;
-it.lab.textContent=L(it.n.n);it.lab.className='nl'+(S.connected?'':' off')+(dim?' dim':'')+(sel?' sel':'');
+var dim=act&&act.indexOf(it.n.id)<0,sel=S.node===it.n.id,c=S.connected?sysCount(it.n.id):0;
+paint(it,!S.connected?'off':c?'hot':'on');
+it.mat.opacity=dim?0.25:1;it.sel=sel;
+it.tube.visible=S.connected;it.tube.material.opacity=dim?0.1:(c?0.95:0.6);it.tube.material.color.set(c?0xE08A63:0xA9B6E8);
+it.stub.visible=it.cap.visible=!S.connected;
+it.pulses.forEach(function(p){p.visible=S.connected&&!dim;p.material.color.set(c?0xE08A63:0xFBF7F0)});
+it.lab.innerHTML=esc(L(it.n.n))+(c?'<span class="n">'+c+'</span>':'');
+it.lab.className='nl'+(S.connected?'':' off')+(dim?' dim':'')+(sel?' sel':'');
 });
-tk.forEach(function(k){tiles[k].material.color.set(S.connected?0x2E3A6B:0xE9E4F0);tiles[k].scale.setScalar(S.mod===k?1.3:1)});
+tk.forEach(function(k){tiles[k].material.color.set(S.connected?0xA9B6E8:0x4A3B30);tiles[k].scale.setScalar(S.mod===k?1.3:1)});
 };
 G.sync();
-cv.addEventListener('pointerdown',function(e){ptr[e.pointerId]={x:e.clientX,y:e.clientY};drag=true;moved=0;lastD=0;try{cv.setPointerCapture(e.pointerId)}catch(x){}});
+cv.addEventListener('pointerdown',function(e){ptr[e.pointerId]={x:e.clientX,y:e.clientY};drag=true;moved=0;lastD=0;cv.style.cursor='grabbing';try{cv.setPointerCapture(e.pointerId)}catch(x){}});
 cv.addEventListener('pointermove',function(e){
 var p=ptr[e.pointerId];if(!p)return;var ids=Object.keys(ptr);
-if(ids.length>=2){p.x=e.clientX;p.y=e.clientY;var a=ptr[ids[0]],b=ptr[ids[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(lastD)R=Math.min(30,Math.max(10,R*lastD/d));lastD=d;moved=99;return}
-var dx=e.clientX-p.x,dy=e.clientY-p.y;moved+=Math.abs(dx)+Math.abs(dy);ang-=dx*0.008;el=Math.min(1.2,Math.max(0.12,el+dy*0.005));p.x=e.clientX;p.y=e.clientY;idle=0;
+if(ids.length>=2){p.x=e.clientX;p.y=e.clientY;var a=ptr[ids[0]],b=ptr[ids[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(lastD&&d)R=Math.min(32,Math.max(12,R*lastD/d));lastD=d;moved=99;return}
+var dx=e.clientX-p.x,dy=e.clientY-p.y;moved+=Math.abs(dx)+Math.abs(dy);ang-=dx*0.008;if(e.pointerType==='mouse')el=Math.min(1.1,Math.max(0.1,el+dy*0.005));p.x=e.clientX;p.y=e.clientY;idle=0;
 });
 function up(e){
-if(ptr[e.pointerId]&&moved<8&&Object.keys(ptr).length===1){
+if(e.type==='pointerup'&&ptr[e.pointerId]&&moved<8&&Object.keys(ptr).length===1){
 var rc=cv.getBoundingClientRect(),v=new THREE.Vector2((e.clientX-rc.left)/rc.width*2-1,-(e.clientY-rc.top)/rc.height*2+1),ray=new THREE.Raycaster();ray.setFromCamera(v,cam);
-var hit=ray.intersectObjects(pick)[0];if(hit){var id=hit.object.userData.id;S.node=S.node===id?null:id;rConn()}
+var hit=ray.intersectObjects(pick)[0];if(hit){var id=hit.object.userData.id;S.node=S.node===id?null:id;rStage()}
 }
-delete ptr[e.pointerId];lastD=0;if(!Object.keys(ptr).length)drag=false;
+delete ptr[e.pointerId];lastD=0;if(!Object.keys(ptr).length){drag=false;cv.style.cursor='grab'}
 }
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
-cv.addEventListener('wheel',function(e){e.preventDefault();R=Math.min(30,Math.max(10,R+e.deltaY*0.02))},{passive:false});
+cv.addEventListener('wheel',function(e){if(!e.ctrlKey)return;e.preventDefault();R=Math.min(32,Math.max(12,R+e.deltaY*0.05))},{passive:false});
 var v3=new THREE.Vector3(),t0=performance.now();
 (function loop(now){
 requestAnimationFrame(loop);
-if(S.view!=='connections')return;
+if(S.view!=='home')return;
 var w=stage.clientWidth,h=stage.clientHeight;if(!w)return;
-if(w!==W||h!==H){W=w;H=h;r.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix()}
-idle++;if(!drag&&idle>90&&!still)ang+=0.0025;
-cam.position.set(Math.sin(ang)*Math.cos(el)*R,Math.sin(el)*R+1.5,Math.cos(ang)*Math.cos(el)*R);cam.lookAt(0,1.8,0);
+if(w!==W||h!==H){W=w;H=h;r.setSize(W,H,false);cam.aspect=W/H;cam.fov=W<520?60:44;cam.updateProjectionMatrix()}
+idle++;if(!drag&&idle>90&&!still)ang+=0.002;
+cam.position.set(Math.sin(ang)*Math.cos(el)*R,Math.sin(el)*R+1,Math.cos(ang)*Math.cos(el)*R);cam.lookAt(0,1.3,0);
 var tt=((now||0)-t0)/1000;
 items.forEach(function(it){
-if(it.pulse.visible){var f=(tt*0.35+it.off)%1;it.pulse.position.copy(it.pos).lerp(hub,still?0.5:f)}
-v3.copy(it.pos).project(cam);
-it.lab.style.transform=v3.z>1?'translate(-999px,-999px)':'translate('+Math.round((v3.x*.5+.5)*W)+'px,'+Math.round((-v3.y*.5+.5)*H)+'px) translateX(-50%)';
+var bob=still?0:Math.sin(tt*1.1+it.off*5)*0.12;
+it.mesh.position.y=it.pos.y+bob;it.mesh.quaternion.copy(cam.quaternion);it.mesh.scale.setScalar(it.sel?1.3:1);
+it.pulses.forEach(function(p){if(p.visible)p.position.copy(it.curve.getPoint(still?0.5:(tt*0.3+it.off+p.userData.o)%1))});
+v3.copy(it.mesh.position);v3.y-=1.15;v3.project(cam);
+it.lab.style.transform=v3.z>1?'translate(-999px,-999px)':'translate('+Math.round((v3.x*.5+.5)*W)+'px,'+Math.round((-v3.y*.5+.5)*H)+'px) translate(-50%,-50%)';
 });
 r.render(sc,cam);
 })();
 }};
 
-var hv=location.hash.slice(1);if(VIEWS.indexOf(hv)>=0){S.view=hv;S.tour=0}
-all();if(S.view==='connections')G.init();
+var hv=location.hash.slice(1);if(VIEWS.indexOf(hv)>=0)S.view=hv;
+all();if(S.view==='home')G.init();
 })();
 </script>
 </body>
